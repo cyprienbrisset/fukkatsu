@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -88,8 +89,11 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
 
         if (landscape) {
             Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
-                Box(Modifier.fillMaxHeight().weight(0.38f), contentAlignment = Alignment.TopStart) {
-                    AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                Column(Modifier.fillMaxHeight().weight(0.38f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    HomeBranding(portrait = false, modifier = Modifier.padding(top = 8.dp))
+                    Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                        AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                    }
                 }
                 VerticalVermilionRule(Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp), length = 220.dp)
                 Column(Modifier.fillMaxHeight().weight(0.62f).padding(start = 30.dp), verticalArrangement = Arrangement.Center) {
@@ -101,6 +105,8 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
         } else {
             Column(Modifier.fillMaxSize().padding(horizontal = 32.dp, vertical = 40.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(Modifier.height(20.dp))
+                HomeBranding(portrait = true)
+                Spacer(Modifier.height(24.dp))
                 AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = true)
                 Spacer(Modifier.height(28.dp))
                 SectionLabel("アプリ", "MES APPS")
