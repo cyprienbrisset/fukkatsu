@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.data.tile.TileType
 import com.cyprienbrisset.myportal.launch.LaunchIntentResolver
+import com.cyprienbrisset.myportal.system.DndController
 import com.cyprienbrisset.myportal.ui.sumi.SealIconButton
 import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
 import com.cyprienbrisset.myportal.ui.sumi.VerticalVermilionRule
@@ -57,12 +61,23 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val landscape = maxWidth > maxHeight
         WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = (-64).dp, y = (-10).dp))
-        SealIconButton(
-            icon = Icons.Rounded.Settings,
-            contentDescription = "Réglages",
-            onClick = onOpenSettings,
-            modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 16.dp, end = 30.dp),
-        )
+        val dndOn = remember(now) { DndController.isGranted(ctx) && DndController.isDndOn(ctx) }
+        Row(
+            Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 16.dp, end = 30.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SealIconButton(
+                icon = if (dndOn) Icons.Rounded.NotificationsOff else Icons.Rounded.Notifications,
+                contentDescription = "Ne pas déranger",
+                active = dndOn,
+                onClick = { DndController.toggleOrRequest(ctx) },
+            )
+            SealIconButton(
+                icon = Icons.Rounded.Settings,
+                contentDescription = "Réglages",
+                onClick = onOpenSettings,
+            )
+        }
 
         if (landscape) {
             Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
