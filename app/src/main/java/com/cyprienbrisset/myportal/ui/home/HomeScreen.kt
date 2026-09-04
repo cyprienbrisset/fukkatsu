@@ -38,8 +38,10 @@ fun HomeScreen(
                     }
                 }
                 TileType.WEB -> {
-                    // TODO(Task 9): launch WebAppActivity
-                    Toast.makeText(ctx, "Web tile (à venir)", Toast.LENGTH_SHORT).show()
+                    ctx.startActivity(
+                        android.content.Intent(ctx, com.cyprienbrisset.myportal.web.WebAppActivity::class.java)
+                            .putExtra(com.cyprienbrisset.myportal.web.WebAppActivity.EXTRA_URL, tile.url)
+                    )
                 }
             }
         })
