@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cyprienbrisset.myportal.data.tile.TileType
@@ -32,7 +33,7 @@ fun HomeScreen(
         IconButton(onClick = onOpenSettings) {
             Icon(Icons.Filled.Settings, contentDescription = "Réglages")
         }
-        TileGrid(tiles = tiles, onTileClick = { tile ->
+        TileGrid(tiles = tiles, minTileWidth = 160.dp, onTileClick = { tile ->
             when (tile.type) {
                 TileType.APP -> {
                     val pkg = tile.packageName
@@ -47,6 +48,6 @@ fun HomeScreen(
                     )
                 }
             }
-        })
+        }, onAddClick = {})
     }
 }
