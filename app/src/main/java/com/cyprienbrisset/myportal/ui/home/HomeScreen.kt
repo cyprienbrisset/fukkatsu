@@ -66,7 +66,7 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
 
         if (landscape) {
             Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
-                Box(Modifier.fillMaxHeight().weight(0.38f), contentAlignment = Alignment.CenterStart) {
+                Box(Modifier.fillMaxHeight().weight(0.38f), contentAlignment = Alignment.TopStart) {
                     AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
                 }
                 VerticalVermilionRule(Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp), length = 220.dp)

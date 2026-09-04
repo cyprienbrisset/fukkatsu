@@ -34,9 +34,10 @@ fun AmbientBanner(
     val align = if (portrait) Alignment.CenterHorizontally else Alignment.Start
 
     Column(modifier, horizontalAlignment = align) {
-        Text("復活", fontFamily = Mincho, color = Shu, fontSize = 20.sp)
-        Text("F U K K A T S U", color = SumiMuted, fontSize = 10.sp, letterSpacing = 4.sp)
-        Spacer(Modifier.height(if (portrait) 10.dp else 14.dp))
+        Text("復活", fontFamily = Mincho, fontWeight = FontWeight.Medium, color = Shu,
+            fontSize = if (portrait) 84.sp else 120.sp)
+        Text("F U K K A T S U", color = SumiMuted, fontSize = 13.sp, letterSpacing = 6.sp)
+        Spacer(Modifier.height(if (portrait) 8.dp else 10.dp))
         Text(time, fontFamily = Mincho, fontWeight = FontWeight.Normal, color = Kinari, fontSize = if (portrait) 72.sp else 92.sp)
         Spacer(Modifier.height(12.dp))
         Text(date, color = Kinari, fontSize = 16.sp)
