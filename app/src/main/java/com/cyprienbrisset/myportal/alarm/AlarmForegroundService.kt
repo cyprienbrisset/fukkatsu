@@ -22,6 +22,11 @@ class AlarmForegroundService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Become foreground first on EVERY start path to satisfy the O+ startForegroundService contract.
+        val alarmId = intent?.getLongExtra(AlarmReceiver.EXTRA_ALARM_ID, -1) ?: -1
+        val label = intent?.getStringExtra(EXTRA_LABEL) ?: ""
+        startForeground(AlarmNotifications.NOTIF_ID, AlarmNotifications.buildRinging(this, alarmId, label))
+
         when (intent?.action) {
             ACTION_STOP -> { stopEverything(); return START_NOT_STICKY }
             ACTION_SNOOZE -> {
@@ -31,14 +36,14 @@ class AlarmForegroundService : Service() {
                 stopEverything(); return START_NOT_STICKY
             }
         }
-        val alarmId = intent?.getLongExtra(AlarmReceiver.EXTRA_ALARM_ID, -1) ?: -1
-        val label = intent?.getStringExtra(EXTRA_LABEL) ?: ""
-        val ringUri = intent?.getStringExtra(EXTRA_RINGTONE)
+        if (intent == null) { stopEverything(); return START_NOT_STICKY } // guard null re-delivery
 
-        startForeground(AlarmNotifications.NOTIF_ID, AlarmNotifications.buildRinging(this, alarmId, label))
+        // Fresh ring — reset any prior sound/wakelock/ramp first (guards double-start).
+        resetRinging()
+        val ringUri = intent.getStringExtra(EXTRA_RINGTONE)
         acquireWakeLock()
         startRinging(ringUri)
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     private fun acquireWakeLock() {
@@ -78,10 +83,15 @@ class AlarmForegroundService : Service() {
         handler.postDelayed(tick, RAMP_INTERVAL_MS)
     }
 
-    private fun stopEverything() {
+    private fun resetRinging() {
         handler.removeCallbacksAndMessages(null)
+        rampStep = 0
         ringtone?.stop(); ringtone = null
         wakeLock?.let { if (it.isHeld) it.release() }; wakeLock = null
+    }
+
+    private fun stopEverything() {
+        resetRinging()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) stopForeground(STOP_FOREGROUND_REMOVE)
         else @Suppress("DEPRECATION") stopForeground(true)
         stopSelf()

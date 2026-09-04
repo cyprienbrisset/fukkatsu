@@ -18,12 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import com.cyprienbrisset.myportal.data.AppDatabase
 import com.cyprienbrisset.myportal.data.alarm.AlarmRepository
 import com.cyprienbrisset.myportal.ui.theme.MyPortalTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class AlarmRingActivity : ComponentActivity() {
 
@@ -36,10 +34,10 @@ class AlarmRingActivity : ComponentActivity() {
             var snoozeMinutes by remember { mutableStateOf(10) }
             if (alarmId >= 0) {
                 androidx.compose.runtime.LaunchedEffect(alarmId) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val a = AlarmRepository(AppDatabase.get(this@AlarmRingActivity).alarmDao()).byId(alarmId)
-                        if (a != null) snoozeMinutes = a.snoozeMinutes
+                    val a = kotlinx.coroutines.withContext(Dispatchers.IO) {
+                        AlarmRepository(AppDatabase.get(this@AlarmRingActivity).alarmDao()).byId(alarmId)
                     }
+                    if (a != null) snoozeMinutes = a.snoozeMinutes
                 }
             }
             MyPortalTheme {

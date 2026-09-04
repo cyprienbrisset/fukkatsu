@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,6 +23,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.data.tile.TileType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 fun monogramLetter(label: String): String =
     label.trim().firstOrNull()?.uppercase() ?: "?"
@@ -55,21 +61,23 @@ fun TileIcon(tile: TileEntity, size: Dp, modifier: Modifier = Modifier) {
     when (tile.type) {
         TileType.APP -> {
             val pkg = tile.packageName
-            val bitmap = remember(pkg) {
-                if (pkg == null) {
-                    null
-                } else {
+            var bmp by remember(pkg) { mutableStateOf<android.graphics.Bitmap?>(null) }
+            var failed by remember(pkg) { mutableStateOf(false) }
+            LaunchedEffect(pkg) {
+                if (pkg == null) { failed = true; return@LaunchedEffect }
+                val loaded = withContext(Dispatchers.IO) {
                     runCatching { ctx.packageManager.getApplicationIcon(pkg).toBitmap() }.getOrNull()
                 }
+                if (loaded != null) bmp = loaded else failed = true
             }
-            if (bitmap != null) {
-                AsyncImage(
-                    model = ImageRequest.Builder(ctx).data(bitmap).build(),
+            when {
+                bmp != null -> AsyncImage(
+                    model = ImageRequest.Builder(ctx).data(bmp).build(),
                     contentDescription = tile.label,
                     modifier = modifier.size(size).clip(shape),
                 )
-            } else {
-                Monogram(tile.label, size, modifier)
+                failed -> Monogram(tile.label, size, modifier)
+                else -> androidx.compose.foundation.layout.Box(modifier.size(size))
             }
         }
         TileType.WEB -> {
@@ -77,11 +85,17 @@ fun TileIcon(tile: TileEntity, size: Dp, modifier: Modifier = Modifier) {
             if (url == null) {
                 Monogram(tile.label, size, modifier)
             } else {
-                AsyncImage(
-                    model = ImageRequest.Builder(ctx).data(faviconUrl(url)).crossfade(true).build(),
-                    contentDescription = tile.label,
-                    modifier = modifier.size(size).clip(shape),
-                )
+                var loadFailed by remember(url) { mutableStateOf(false) }
+                if (loadFailed) {
+                    Monogram(tile.label, size, modifier)
+                } else {
+                    AsyncImage(
+                        model = ImageRequest.Builder(ctx).data(faviconUrl(url)).crossfade(true).build(),
+                        contentDescription = tile.label,
+                        modifier = modifier.size(size).clip(shape),
+                        onError = { loadFailed = true },
+                    )
+                }
             }
         }
     }
