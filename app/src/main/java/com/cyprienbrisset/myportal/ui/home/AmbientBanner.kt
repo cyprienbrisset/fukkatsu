@@ -20,6 +20,7 @@ fun AmbientBanner(
     weather: Weather?,
     modifier: Modifier = Modifier,
     nextAlarm: LocalDateTime? = null,
+    portrait: Boolean = false,
 ) {
     val timeFmt = DateTimeFormatter.ofPattern("HH:mm")
     val dateFmt = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.FRENCH)
@@ -28,23 +29,53 @@ fun AmbientBanner(
         in 12..17 -> "Bon après-midi"
         else -> "Bonsoir"
     }
-    Row(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column {
-            Text(now.format(timeFmt), fontSize = 64.sp, fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground)
-            Text("$greeting · ${now.format(dateFmt)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            if (nextAlarm != null) {
-                Text("⏰ ${nextAlarm.format(DateTimeFormatter.ofPattern("EEE HH:mm", Locale.FRENCH))}",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
+
+    @Composable
+    fun ClockText(sizeSp: Int) {
+        Text(now.format(timeFmt), fontSize = sizeSp.sp, fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground)
+    }
+    @Composable
+    fun GreetingText() {
+        Text("$greeting · ${now.format(dateFmt)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+    @Composable
+    fun WeatherText() {
         if (weather != null) {
             Text("${weather.temperatureC}° · ${weather.description}",
                 fontSize = 22.sp, color = MaterialTheme.colorScheme.onBackground)
+        }
+    }
+    @Composable
+    fun NextAlarmText() {
+        if (nextAlarm != null) {
+            Text("⏰ ${nextAlarm.format(DateTimeFormatter.ofPattern("EEE HH:mm", Locale.FRENCH))}",
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+
+    if (portrait) {
+        Column(
+            modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ClockText(72)
+            GreetingText()
+            WeatherText()
+            NextAlarmText()
+        }
+    } else {
+        Row(
+            modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column {
+                ClockText(64)
+                GreetingText()
+                NextAlarmText()
+            }
+            WeatherText()
         }
     }
 }

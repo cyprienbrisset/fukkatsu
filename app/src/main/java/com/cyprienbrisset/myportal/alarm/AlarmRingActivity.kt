@@ -1,38 +1,49 @@
 package com.cyprienbrisset.myportal.alarm
 
-import android.media.AudioManager
-import android.media.Ringtone
-import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cyprienbrisset.myportal.data.AppDatabase
+import com.cyprienbrisset.myportal.data.alarm.AlarmRepository
 import com.cyprienbrisset.myportal.ui.theme.MyPortalTheme
+import kotlinx.coroutines.Dispatchers
 
 class AlarmRingActivity : ComponentActivity() {
-    private var ringtone: Ringtone? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         showOverLockScreen()
-        startRinging()
-
         val alarmId = intent.getLongExtra(AlarmReceiver.EXTRA_ALARM_ID, -1)
 
         setContent {
+            var snoozeMinutes by remember { mutableStateOf(10) }
+            if (alarmId >= 0) {
+                androidx.compose.runtime.LaunchedEffect(alarmId) {
+                    val a = kotlinx.coroutines.withContext(Dispatchers.IO) {
+                        AlarmRepository(AppDatabase.get(this@AlarmRingActivity).alarmDao()).byId(alarmId)
+                    }
+                    if (a != null) snoozeMinutes = a.snoozeMinutes
+                }
+            }
             MyPortalTheme {
-                androidx.compose.material3.Surface(
+                Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.background,
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     Column(
                         Modifier.fillMaxSize().padding(48.dp),
@@ -41,9 +52,14 @@ class AlarmRingActivity : ComponentActivity() {
                     ) {
                         Text("Réveil", fontSize = 48.sp)
                         Spacer(Modifier.height(48.dp))
-                        Button(onClick = { stopAndFinish() }) { Text("Arrêter") }
+                        Button(onClick = { AlarmForegroundService.stop(this@AlarmRingActivity); finish() }) {
+                            Text("Arrêter")
+                        }
                         Spacer(Modifier.height(16.dp))
-                        OutlinedButton(onClick = { snooze(alarmId) }) { Text("Snooze 10 min") }
+                        OutlinedButton(onClick = {
+                            if (alarmId >= 0) AlarmForegroundService.snooze(this@AlarmRingActivity, alarmId, snoozeMinutes)
+                            finish()
+                        }) { Text("Snooze $snoozeMinutes min") }
                     }
                 }
             }
@@ -61,28 +77,5 @@ class AlarmRingActivity : ComponentActivity() {
                     or android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             )
         }
-    }
-
-    private fun startRinging() {
-        val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        ringtone = RingtoneManager.getRingtone(applicationContext, uri).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) isLooping = true
-            streamType = AudioManager.STREAM_ALARM
-            play()
-        }
-    }
-
-    private fun snooze(alarmId: Long) {
-        if (alarmId >= 0) AlarmSnooze.schedule(this, alarmId, minutes = 10)
-        stopAndFinish()
-    }
-
-    private fun stopAndFinish() {
-        ringtone?.stop(); ringtone = null; finish()
-    }
-
-    override fun onDestroy() {
-        ringtone?.stop(); super.onDestroy()
     }
 }

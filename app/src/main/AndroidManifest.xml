@@ -7,6 +7,13 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Exact alarms: USE_EXACT_ALARM is auto-granted for genuine alarm-clock apps (API 33+);
+         SCHEDULE_EXACT_ALARM covers API 31-32. Not needed on the Portal (API 29) but required on newer devices. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
 
     <queries>
         <intent>
@@ -28,6 +35,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize"
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
             <intent-filter>
@@ -51,6 +59,11 @@
             android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:theme="@style/Theme.MyPortal" />
+
+        <service
+            android:name=".alarm.AlarmForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
         <receiver android:name=".alarm.AlarmReceiver" android:exported="false" />
         <receiver android:name=".alarm.BootReceiver" android:exported="true">
