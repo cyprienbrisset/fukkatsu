@@ -18,7 +18,7 @@ import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 @Composable
 fun SectionLabel(kana: String, text: String, modifier: Modifier = Modifier) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        Text("$kana  $text", style = MaterialTheme.typography.labelLarge, color = SumiMuted)
+        Text(text, style = MaterialTheme.typography.labelLarge, color = SumiMuted)
         Spacer(Modifier.padding(horizontal = 6.dp))
         Box(Modifier.weight(1f).height(1.dp).background(SumiLine))
     }

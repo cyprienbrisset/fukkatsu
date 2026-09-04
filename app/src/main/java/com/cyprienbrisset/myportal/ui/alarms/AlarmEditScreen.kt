@@ -44,7 +44,7 @@ fun AlarmEditScreen(onDone: () -> Unit, vm: AlarmsViewModel = viewModel()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("鈴", size = 40.dp, onClick = onDone)
             Spacer(Modifier.width(14.dp))
-            Text("目覚まし · Nouvelle alarme", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+            Text("Nouvelle alarme", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
         }
         Spacer(Modifier.height(24.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {

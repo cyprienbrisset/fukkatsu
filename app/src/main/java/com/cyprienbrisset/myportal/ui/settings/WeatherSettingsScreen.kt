@@ -43,7 +43,7 @@ fun WeatherSettingsScreen(onBack: () -> Unit, vm: WeatherSettingsViewModel = vie
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("天", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))
-            Text("天気 · Ville météo", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+            Text("Ville météo", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
         }
         OutlinedTextField(query, { query = it; vm.search(it) }, label = { Text("Rechercher une ville") }, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(16.dp))

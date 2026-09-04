@@ -13,10 +13,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.data.weather.Weather
-import com.cyprienbrisset.myportal.ui.sumi.weekdayKanji
 import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
-import com.cyprienbrisset.myportal.ui.theme.Shu
 import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -31,8 +29,7 @@ fun AmbientBanner(
     portrait: Boolean = false,
 ) {
     val time = now.format(DateTimeFormatter.ofPattern("HH:mm"))
-    val date = now.format(DateTimeFormatter.ofPattern("d MMMM", Locale.FRENCH))
-    val kanji = weekdayKanji(now.dayOfWeek)
+    val date = now.format(DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.FRENCH))
     val align = if (portrait) Alignment.CenterHorizontally else Alignment.Start
 
     Column(modifier, horizontalAlignment = align) {
@@ -40,10 +37,7 @@ fun AmbientBanner(
         Spacer(Modifier.height(if (portrait) 12.dp else 18.dp))
         Text(time, fontFamily = Mincho, fontWeight = FontWeight.Normal, color = Kinari, fontSize = if (portrait) 72.sp else 92.sp)
         Spacer(Modifier.height(12.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(kanji, color = Shu, fontFamily = Mincho, fontSize = 16.sp)
-            Text("  ·  $date", color = Kinari, fontSize = 16.sp)
-        }
+        Text(date, color = Kinari, fontSize = 16.sp)
         Spacer(Modifier.height(6.dp))
         val wx = buildString {
             if (weather != null) append("${weather.temperatureC}°  ${weather.description}")

@@ -51,7 +51,7 @@ fun TileEditScreen(onBack: () -> Unit, vm: TileEditViewModel = viewModel()) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("＋", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))
-            Text("タイル · Tuiles", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+            Text("Tuiles", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
         }
 
         SegmentedChoice(

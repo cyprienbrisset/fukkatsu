@@ -64,7 +64,7 @@ class AlarmRingActivity : ComponentActivity() {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         WatermarkKanji("鈴", size = 260.sp)
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("目覚まし · RÉVEIL", color = Shu, fontFamily = Mincho, fontSize = 15.sp, letterSpacing = 4.sp)
+                            Text("RÉVEIL", color = Shu, fontFamily = Mincho, fontSize = 15.sp, letterSpacing = 4.sp)
                             Spacer(Modifier.height(10.dp))
                             Text(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")),
                                 fontFamily = Mincho, color = Kinari, fontSize = 78.sp)
@@ -83,7 +83,7 @@ class AlarmRingActivity : ComponentActivity() {
                                         .clickable { AlarmForegroundService.stop(this@AlarmRingActivity); finish() },
                                     contentAlignment = Alignment.Center,
                                 ) {
-                                    Text("止\nArrêter", color = Kinari, fontFamily = Mincho, fontSize = 15.sp, textAlign = TextAlign.Center)
+                                    Text("Arrêter", color = Kinari, fontFamily = Mincho, fontSize = 15.sp, textAlign = TextAlign.Center)
                                 }
                             }
                         }

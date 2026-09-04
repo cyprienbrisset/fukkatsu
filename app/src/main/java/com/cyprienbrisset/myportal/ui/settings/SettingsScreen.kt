@@ -32,7 +32,7 @@ fun SettingsScreen(onBack: () -> Unit, onTiles: () -> Unit, onAlarms: () -> Unit
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("朱", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))
-            Text("設定 · Réglages", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+            Text("Réglages", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
         }
         SettingRow("アプリ", "Tuiles", null, onTiles)
         SettingRow("目覚まし", "Alarmes", null, onAlarms)

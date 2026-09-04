@@ -40,7 +40,6 @@ fun SegmentedChoice(options: List<Segment>, selectedIndex: Int, onSelect: (Int) 
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(seg.kana, color = if (on) OnShu else SumiMuted, fontSize = 11.sp, letterSpacing = 2.sp)
                 Text(seg.text, color = if (on) OnShu else Kinari, fontWeight = FontWeight.Medium, fontSize = 17.sp)
             }
         }

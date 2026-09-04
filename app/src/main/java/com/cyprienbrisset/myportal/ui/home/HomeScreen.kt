@@ -54,7 +54,7 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val landscape = maxWidth > maxHeight
-        WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = (-10).dp, y = (-10).dp))
+        WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = (-64).dp, y = (-10).dp))
         HankoSeal(
             "朱",
             Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 16.dp, end = 30.dp),

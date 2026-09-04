@@ -40,7 +40,7 @@ fun AlarmsScreen(onBack: () -> Unit, onAdd: () -> Unit, vm: AlarmsViewModel = vi
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("鈴", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))
-            Text("目覚まし · Alarmes", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+            Text("Alarmes", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
             Spacer(Modifier.weight(1f))
             HankoSeal("＋", size = 44.dp, onClick = onAdd)
         }
