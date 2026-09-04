@@ -9,6 +9,11 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Exact alarms: USE_EXACT_ALARM is auto-granted for genuine alarm-clock apps (API 33+);
+         SCHEDULE_EXACT_ALARM covers API 31-32. Not needed on the Portal (API 29) but required on newer devices. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
 
     <queries>
         <intent>
