@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cyprienbrisset.myportal.data.tile.TileEntity
+import com.cyprienbrisset.myportal.data.tile.TileType
 import com.cyprienbrisset.myportal.launch.InstalledApp
 import com.cyprienbrisset.myportal.ui.home.TileIcon
 import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
@@ -71,7 +73,10 @@ fun TileEditScreen(onBack: () -> Unit, vm: TileEditViewModel = viewModel()) {
             ) {
                 items(apps, key = { it.packageName }) { a ->
                     Medallion(label = a.label, onClick = { vm.addApp(a.label, a.packageName) }) {
-                        Text(a.label.trim().take(1).uppercase(), color = Kinari, fontFamily = Mincho, fontSize = 24.sp)
+                        TileIcon(
+                            tile = TileEntity(type = TileType.APP, label = a.label, packageName = a.packageName, position = 0),
+                            size = 46.dp,
+                        )
                     }
                 }
             }

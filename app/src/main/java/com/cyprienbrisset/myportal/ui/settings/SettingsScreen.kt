@@ -34,22 +34,19 @@ fun SettingsScreen(onBack: () -> Unit, onTiles: () -> Unit, onAlarms: () -> Unit
             Spacer(Modifier.width(14.dp))
             Text("Réglages", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
         }
-        SettingRow("アプリ", "Tuiles", null, onTiles)
-        SettingRow("目覚まし", "Alarmes", null, onAlarms)
-        SettingRow("天気", "Ville météo", null, onWeather)
+        SettingRow("Tuiles", null, onTiles)
+        SettingRow("Alarmes", null, onAlarms)
+        SettingRow("Ville météo", null, onWeather)
     }
 }
 
 @Composable
-private fun SettingRow(kana: String, text: String, value: String?, onClick: () -> Unit) {
+private fun SettingRow(text: String, value: String?, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().heightIn(min = 68.dp).clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(kana, color = SumiMuted, fontSize = 11.sp, letterSpacing = 2.sp)
-            Text(text, color = Kinari, fontSize = 17.sp)
-        }
+        Text(text, color = Kinari, fontSize = 17.sp, modifier = Modifier.weight(1f))
         if (value != null) Text(value, color = SumiMuted, fontSize = 14.sp)
         Spacer(Modifier.width(10.dp))
         Text("›", color = Shu, fontSize = 22.sp)
