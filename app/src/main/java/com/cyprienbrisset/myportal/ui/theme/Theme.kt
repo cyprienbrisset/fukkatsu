@@ -1,22 +1,22 @@
 package com.cyprienbrisset.myportal.ui.theme
-import androidx.compose.foundation.isSystemInDarkTheme
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
-private val PortalColors = darkColorScheme(
-    primary = PortalAccent,
-    background = PortalBg,
-    surface = PortalSurface,
-    surfaceVariant = PortalSurfaceHi,
-    onBackground = PortalOnDark,
-    onSurface = PortalOnDark,
+private val SumiColors = darkColorScheme(
+    primary = Shu,
+    onPrimary = OnShu,
+    background = Sumi,
+    onBackground = Kinari,
+    surface = SumiSurface,
+    onSurface = Kinari,
+    surfaceVariant = SumiSurface,
+    onSurfaceVariant = SumiMuted,
+    outline = SumiLine,
 )
 
 @Composable
-fun MyPortalTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit,
-) {
-    MaterialTheme(colorScheme = PortalColors, typography = PortalTypography, content = content)
+fun MyPortalTheme(content: @Composable () -> Unit) {
+    MaterialTheme(colorScheme = SumiColors, typography = PortalTypography, content = content)
 }

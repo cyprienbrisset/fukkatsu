@@ -10,6 +10,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val TILE_EDIT = "tile_edit"
     const val ALARMS = "alarms"
+    const val ALARM_EDIT = "alarm_edit"
 }
 
 @Composable
@@ -37,7 +38,13 @@ fun AppNav() {
             com.cyprienbrisset.myportal.ui.settings.WeatherSettingsScreen(onBack = { nav.popBackStack() })
         }
         composable(Routes.ALARMS) {
-            com.cyprienbrisset.myportal.ui.alarms.AlarmsScreen(onBack = { nav.popBackStack() })
+            com.cyprienbrisset.myportal.ui.alarms.AlarmsScreen(
+                onBack = { nav.popBackStack() },
+                onAdd = { nav.navigate(Routes.ALARM_EDIT) },
+            )
+        }
+        composable(Routes.ALARM_EDIT) {
+            com.cyprienbrisset.myportal.ui.alarms.AlarmEditScreen(onDone = { nav.popBackStack() })
         }
     }
 }

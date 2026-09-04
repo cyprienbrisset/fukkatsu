@@ -1,15 +1,23 @@
 package com.cyprienbrisset.myportal.ui.home
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.data.weather.Weather
+import com.cyprienbrisset.myportal.ui.sumi.weekdayKanji
+import com.cyprienbrisset.myportal.ui.theme.Kinari
+import com.cyprienbrisset.myportal.ui.theme.Mincho
+import com.cyprienbrisset.myportal.ui.theme.Shu
+import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -22,60 +30,28 @@ fun AmbientBanner(
     nextAlarm: LocalDateTime? = null,
     portrait: Boolean = false,
 ) {
-    val timeFmt = DateTimeFormatter.ofPattern("HH:mm")
-    val dateFmt = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.FRENCH)
-    val greeting = when (now.hour) {
-        in 5..11 -> "Bonjour"
-        in 12..17 -> "Bon après-midi"
-        else -> "Bonsoir"
-    }
+    val time = now.format(DateTimeFormatter.ofPattern("HH:mm"))
+    val date = now.format(DateTimeFormatter.ofPattern("d MMMM", Locale.FRENCH))
+    val kanji = weekdayKanji(now.dayOfWeek)
+    val align = if (portrait) Alignment.CenterHorizontally else Alignment.Start
 
-    @Composable
-    fun ClockText(sizeSp: Int) {
-        Text(now.format(timeFmt), fontSize = sizeSp.sp, fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground)
-    }
-    @Composable
-    fun GreetingText() {
-        Text("$greeting · ${now.format(dateFmt)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-    @Composable
-    fun WeatherText() {
-        if (weather != null) {
-            Text("${weather.temperatureC}° · ${weather.description}",
-                fontSize = 22.sp, color = MaterialTheme.colorScheme.onBackground)
+    Column(modifier, horizontalAlignment = align) {
+        Text("M Y P O R T A L", color = SumiMuted, fontSize = 11.sp, letterSpacing = 5.sp)
+        Spacer(Modifier.height(if (portrait) 12.dp else 18.dp))
+        Text(time, fontFamily = Mincho, fontWeight = FontWeight.Normal, color = Kinari, fontSize = if (portrait) 72.sp else 92.sp)
+        Spacer(Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(kanji, color = Shu, fontFamily = Mincho, fontSize = 16.sp)
+            Text("  ·  $date", color = Kinari, fontSize = 16.sp)
         }
-    }
-    @Composable
-    fun NextAlarmText() {
-        if (nextAlarm != null) {
-            Text("⏰ ${nextAlarm.format(DateTimeFormatter.ofPattern("EEE HH:mm", Locale.FRENCH))}",
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-
-    if (portrait) {
-        Column(
-            modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            ClockText(72)
-            GreetingText()
-            WeatherText()
-            NextAlarmText()
-        }
-    } else {
-        Row(
-            modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column {
-                ClockText(64)
-                GreetingText()
-                NextAlarmText()
+        Spacer(Modifier.height(6.dp))
+        val wx = buildString {
+            if (weather != null) append("${weather.temperatureC}°  ${weather.description}")
+            if (nextAlarm != null) {
+                if (isNotEmpty()) append("   ·   ")
+                append("⏰ " + nextAlarm.format(DateTimeFormatter.ofPattern("EEE HH:mm", Locale.FRENCH)))
             }
-            WeatherText()
         }
+        if (wx.isNotEmpty()) Text(wx, color = SumiMuted, fontSize = 14.sp, textAlign = if (portrait) TextAlign.Center else TextAlign.Start)
     }
 }
