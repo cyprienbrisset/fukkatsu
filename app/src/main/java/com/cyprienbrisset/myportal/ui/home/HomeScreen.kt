@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,6 +48,7 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
     val now by vm.now.collectAsStateWithLifecycle()
     val weather by vm.weather.collectAsStateWithLifecycle()
     val nextAlarm by vm.nextAlarm.collectAsStateWithLifecycle()
+    val nowPlaying by vm.nowPlaying.collectAsStateWithLifecycle()
 
     val launch: (TileEntity) -> Unit = { tile ->
         when (tile.type) {
@@ -63,6 +65,7 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val landscape = maxWidth > maxHeight
+        LaunchedEffect(now) { vm.refreshNowPlaying() }
         WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = (-64).dp, y = (-10).dp))
         val dndOn = remember(now) { DndController.isGranted(ctx) && DndController.isDndOn(ctx) }
         Row(
@@ -92,7 +95,14 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                 Column(Modifier.fillMaxHeight().weight(0.38f), horizontalAlignment = Alignment.CenterHorizontally) {
                     HomeBranding(portrait = false, modifier = Modifier.padding(top = 8.dp))
                     Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                        AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                            val np = nowPlaying
+                            if (np != null) {
+                                Spacer(Modifier.height(22.dp))
+                                NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
+                            }
+                        }
                     }
                 }
                 VerticalVermilionRule(Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp), length = 220.dp)
@@ -108,6 +118,11 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                 HomeBranding(portrait = true)
                 Spacer(Modifier.height(24.dp))
                 AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = true)
+                val np = nowPlaying
+                if (np != null) {
+                    Spacer(Modifier.height(18.dp))
+                    NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
+                }
                 Spacer(Modifier.height(28.dp))
                 SectionLabel("アプリ", "MES APPS")
                 Spacer(Modifier.height(18.dp))
