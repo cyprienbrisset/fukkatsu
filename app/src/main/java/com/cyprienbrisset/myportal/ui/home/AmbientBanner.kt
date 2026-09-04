@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.data.weather.Weather
 import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
+import com.cyprienbrisset.myportal.ui.theme.Shu
 import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -33,8 +34,9 @@ fun AmbientBanner(
     val align = if (portrait) Alignment.CenterHorizontally else Alignment.Start
 
     Column(modifier, horizontalAlignment = align) {
-        Text("M Y P O R T A L", color = SumiMuted, fontSize = 11.sp, letterSpacing = 5.sp)
-        Spacer(Modifier.height(if (portrait) 12.dp else 18.dp))
+        Text("復活", fontFamily = Mincho, color = Shu, fontSize = 20.sp)
+        Text("F U K K A T S U", color = SumiMuted, fontSize = 10.sp, letterSpacing = 4.sp)
+        Spacer(Modifier.height(if (portrait) 10.dp else 14.dp))
         Text(time, fontFamily = Mincho, fontWeight = FontWeight.Normal, color = Kinari, fontSize = if (portrait) 72.sp else 92.sp)
         Spacer(Modifier.height(12.dp))
         Text(date, color = Kinari, fontSize = 16.sp)
