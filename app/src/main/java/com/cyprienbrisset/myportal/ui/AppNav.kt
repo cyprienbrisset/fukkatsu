@@ -22,8 +22,17 @@ fun AppNav() {
                 onOpenSettings = { nav.navigate(Routes.SETTINGS) }
             )
         }
-        composable(Routes.SETTINGS) { Text("Settings") }
-        composable(Routes.TILE_EDIT) { Text("Tiles") }
+        composable(Routes.SETTINGS) {
+            com.cyprienbrisset.myportal.ui.settings.SettingsScreen(
+                onBack = { nav.popBackStack() },
+                onTiles = { nav.navigate(Routes.TILE_EDIT) },
+                onAlarms = { nav.navigate(Routes.ALARMS) },
+                onWeather = { nav.navigate(Routes.SETTINGS + "/weather") },
+            )
+        }
+        composable(Routes.TILE_EDIT) {
+            com.cyprienbrisset.myportal.ui.settings.TileEditScreen(onBack = { nav.popBackStack() })
+        }
         composable(Routes.ALARMS) { Text("Alarms") }
     }
 }
