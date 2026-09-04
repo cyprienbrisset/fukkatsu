@@ -30,16 +30,21 @@ class AlarmRingActivity : ComponentActivity() {
 
         setContent {
             MyPortalTheme {
-                Column(
-                    Modifier.fillMaxSize().padding(48.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                androidx.compose.material3.Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.background,
                 ) {
-                    Text("Réveil", fontSize = 48.sp)
-                    Spacer(Modifier.height(48.dp))
-                    Button(onClick = { stopAndFinish() }) { Text("Arrêter") }
-                    Spacer(Modifier.height(16.dp))
-                    OutlinedButton(onClick = { snooze(alarmId) }) { Text("Snooze 10 min") }
+                    Column(
+                        Modifier.fillMaxSize().padding(48.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text("Réveil", fontSize = 48.sp)
+                        Spacer(Modifier.height(48.dp))
+                        Button(onClick = { stopAndFinish() }) { Text("Arrêter") }
+                        Spacer(Modifier.height(16.dp))
+                        OutlinedButton(onClick = { snooze(alarmId) }) { Text("Snooze 10 min") }
+                    }
                 }
             }
         }
