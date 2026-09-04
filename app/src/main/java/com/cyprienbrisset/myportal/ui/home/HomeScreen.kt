@@ -67,29 +67,6 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
         val landscape = maxWidth > maxHeight
         LaunchedEffect(now) { vm.refreshNowPlaying() }
         WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = (-64).dp, y = (-10).dp))
-        val dndOn = remember(now) { DndController.isGranted(ctx) && DndController.isDndOn(ctx) }
-        Row(
-            Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 16.dp, end = 30.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SealIconButton(
-                icon = if (dndOn) Icons.Rounded.NotificationsOff else Icons.Rounded.Notifications,
-                contentDescription = "Ne pas déranger",
-                active = dndOn,
-                onClick = { DndController.toggleOrRequest(ctx) },
-            )
-            SealIconButton(
-                icon = Icons.Rounded.PowerSettingsNew,
-                contentDescription = "Éteindre l'écran",
-                onClick = { ScreenLock.lockOrRequest(ctx) },
-            )
-            SealIconButton(
-                icon = Icons.Rounded.Settings,
-                contentDescription = "Réglages",
-                onClick = onOpenSettings,
-            )
-        }
-
         if (landscape) {
             Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
                 Box(Modifier.fillMaxHeight().weight(0.38f)) {
@@ -129,6 +106,30 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                 Spacer(Modifier.height(18.dp))
                 MedallionGrid(tiles, minCellWidth = 104.dp, onTileClick = launch, onAddClick = onAddTile, modifier = Modifier.weight(1f))
             }
+        }
+
+        // Cluster drawn LAST so it sits above the scrollable medallion grid and actually receives taps.
+        val dndOn = remember(now) { DndController.isGranted(ctx) && DndController.isDndOn(ctx) }
+        Row(
+            Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 40.dp, end = 34.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SealIconButton(
+                icon = if (dndOn) Icons.Rounded.NotificationsOff else Icons.Rounded.Notifications,
+                contentDescription = "Ne pas déranger",
+                active = dndOn,
+                onClick = { DndController.toggleOrRequest(ctx) },
+            )
+            SealIconButton(
+                icon = Icons.Rounded.PowerSettingsNew,
+                contentDescription = "Éteindre l'écran",
+                onClick = { ScreenLock.lockOrRequest(ctx) },
+            )
+            SealIconButton(
+                icon = Icons.Rounded.Settings,
+                contentDescription = "Réglages",
+                onClick = onOpenSettings,
+            )
         }
     }
 }
