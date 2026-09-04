@@ -57,3 +57,24 @@ class AlarmScheduler(private val context: Context) {
         )
     }
 }
+
+object AlarmSnooze {
+    fun schedule(context: Context, alarmId: Long, minutes: Int) {
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val triggerMillis = System.currentTimeMillis() + minutes * 60_000L
+        val fire = PendingIntent.getBroadcast(
+            context, alarmId.toInt(),
+            Intent(context, AlarmReceiver::class.java).apply {
+                action = AlarmReceiver.ACTION_FIRE
+                putExtra(AlarmReceiver.EXTRA_ALARM_ID, alarmId)
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        val show = PendingIntent.getActivity(
+            context, alarmId.toInt(),
+            Intent(context, AlarmRingActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        am.setAlarmClock(AlarmManager.AlarmClockInfo(triggerMillis, show), fire)
+    }
+}
