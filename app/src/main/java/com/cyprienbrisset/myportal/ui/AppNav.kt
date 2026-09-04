@@ -33,6 +33,9 @@ fun AppNav() {
         composable(Routes.TILE_EDIT) {
             com.cyprienbrisset.myportal.ui.settings.TileEditScreen(onBack = { nav.popBackStack() })
         }
+        composable(Routes.SETTINGS + "/weather") {
+            com.cyprienbrisset.myportal.ui.settings.WeatherSettingsScreen(onBack = { nav.popBackStack() })
+        }
         composable(Routes.ALARMS) { Text("Alarms") }
     }
 }
