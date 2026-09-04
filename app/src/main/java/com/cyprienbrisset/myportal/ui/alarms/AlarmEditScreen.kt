@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +40,7 @@ fun AlarmEditScreen(onDone: () -> Unit, vm: AlarmsViewModel = viewModel()) {
     var snooze by remember { mutableStateOf(10) }
     var ringtoneUri by remember { mutableStateOf<String?>(null) }
 
-    Column(Modifier.fillMaxSize().padding(horizontal = 32.dp).padding(top = 28.dp)) {
+    Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp).padding(top = 28.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("鈴", size = 40.dp, onClick = onDone)
             Spacer(Modifier.width(14.dp))

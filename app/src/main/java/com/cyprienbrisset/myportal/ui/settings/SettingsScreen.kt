@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +28,7 @@ import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onTiles: () -> Unit, onAlarms: () -> Unit, onWeather: () -> Unit) {
-    Column(Modifier.fillMaxSize().padding(horizontal = 32.dp)) {
+    Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("朱", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))

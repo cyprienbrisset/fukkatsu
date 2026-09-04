@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,7 +36,7 @@ import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 @Composable
 fun AlarmsScreen(onBack: () -> Unit, onAdd: () -> Unit, vm: AlarmsViewModel = viewModel()) {
     val alarms by vm.alarms.collectAsStateWithLifecycle()
-    Column(Modifier.fillMaxSize().padding(horizontal = 32.dp)) {
+    Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("鈴", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))

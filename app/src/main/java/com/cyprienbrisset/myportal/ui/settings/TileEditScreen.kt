@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -46,7 +47,7 @@ fun TileEditScreen(onBack: () -> Unit, vm: TileEditViewModel = viewModel()) {
     var webUrl by remember { mutableStateOf("") }
     LaunchedEffect(Unit) { apps = vm.installedApps() }
 
-    Column(Modifier.fillMaxSize().padding(horizontal = 32.dp)) {
+    Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("＋", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))
