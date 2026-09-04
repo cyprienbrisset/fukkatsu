@@ -23,9 +23,11 @@ fun HomeScreen(
 ) {
     val ctx = LocalContext.current
     val tiles by vm.tiles.collectAsStateWithLifecycle()
+    val now by vm.now.collectAsStateWithLifecycle()
+    val weather by vm.weather.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize()) {
-        // AmbientBanner added in Task 12, placed here.
+        AmbientBanner(now = now, weather = weather)
         IconButton(onClick = onOpenSettings) {
             Icon(Icons.Filled.Settings, contentDescription = "Réglages")
         }
