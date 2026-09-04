@@ -24,7 +24,7 @@ fun SealIconButton(
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 46.dp,
+    size: Dp = 54.dp,
     active: Boolean = false,
 ) {
     val shape = RoundedCornerShape(size / 5)

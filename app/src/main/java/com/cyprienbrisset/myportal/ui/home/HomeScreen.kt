@@ -92,16 +92,17 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
 
         if (landscape) {
             Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
-                Column(Modifier.fillMaxHeight().weight(0.38f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    HomeBranding(portrait = false, modifier = Modifier.padding(top = 8.dp))
-                    Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
-                            val np = nowPlaying
-                            if (np != null) {
-                                Spacer(Modifier.height(22.dp))
-                                NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
-                            }
+                Box(Modifier.fillMaxHeight().weight(0.38f)) {
+                    HomeBranding(portrait = false, modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp))
+                    Column(
+                        Modifier.align(Alignment.Center).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                        val np = nowPlaying
+                        if (np != null) {
+                            Spacer(Modifier.height(24.dp))
+                            NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
                         }
                     }
                 }
