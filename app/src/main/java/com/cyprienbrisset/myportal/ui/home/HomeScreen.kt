@@ -25,9 +25,10 @@ fun HomeScreen(
     val tiles by vm.tiles.collectAsStateWithLifecycle()
     val now by vm.now.collectAsStateWithLifecycle()
     val weather by vm.weather.collectAsStateWithLifecycle()
+    val nextAlarm by vm.nextAlarm.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize()) {
-        AmbientBanner(now = now, weather = weather)
+        AmbientBanner(now = now, weather = weather, nextAlarm = nextAlarm)
         IconButton(onClick = onOpenSettings) {
             Icon(Icons.Filled.Settings, contentDescription = "Réglages")
         }

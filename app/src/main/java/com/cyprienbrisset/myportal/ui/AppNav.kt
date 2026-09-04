@@ -1,6 +1,5 @@
 package com.cyprienbrisset.myportal.ui
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,6 +35,8 @@ fun AppNav() {
         composable(Routes.SETTINGS + "/weather") {
             com.cyprienbrisset.myportal.ui.settings.WeatherSettingsScreen(onBack = { nav.popBackStack() })
         }
-        composable(Routes.ALARMS) { Text("Alarms") }
+        composable(Routes.ALARMS) {
+            com.cyprienbrisset.myportal.ui.alarms.AlarmsScreen(onBack = { nav.popBackStack() })
+        }
     }
 }
