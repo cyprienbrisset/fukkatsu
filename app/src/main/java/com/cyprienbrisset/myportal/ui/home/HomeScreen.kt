@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.NotificationsOff
+import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +32,7 @@ import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.data.tile.TileType
 import com.cyprienbrisset.myportal.launch.LaunchIntentResolver
 import com.cyprienbrisset.myportal.system.DndController
+import com.cyprienbrisset.myportal.system.ScreenLock
 import com.cyprienbrisset.myportal.ui.sumi.SealIconButton
 import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
 import com.cyprienbrisset.myportal.ui.sumi.VerticalVermilionRule
@@ -71,6 +73,11 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                 contentDescription = "Ne pas déranger",
                 active = dndOn,
                 onClick = { DndController.toggleOrRequest(ctx) },
+            )
+            SealIconButton(
+                icon = Icons.Rounded.PowerSettingsNew,
+                contentDescription = "Éteindre l'écran",
+                onClick = { ScreenLock.lockOrRequest(ctx) },
             )
             SealIconButton(
                 icon = Icons.Rounded.Settings,
