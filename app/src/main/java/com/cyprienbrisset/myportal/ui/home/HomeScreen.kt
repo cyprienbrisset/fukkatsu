@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,8 +54,12 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val landscape = maxWidth > maxHeight
-        WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = 40.dp, y = 60.dp))
-        HankoSeal("朱", Modifier.align(Alignment.TopEnd).padding(26.dp), onClick = onOpenSettings)
+        WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = (-10).dp, y = (-10).dp))
+        HankoSeal(
+            "朱",
+            Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 16.dp, end = 30.dp),
+            onClick = onOpenSettings,
+        )
 
         if (landscape) {
             Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
