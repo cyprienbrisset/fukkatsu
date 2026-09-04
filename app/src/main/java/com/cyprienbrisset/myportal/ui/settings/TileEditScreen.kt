@@ -56,7 +56,7 @@ fun TileEditScreen(onBack: () -> Unit, vm: TileEditViewModel = viewModel()) {
 @Composable
 private fun AddTileDialog(vm: TileEditViewModel, onDismiss: () -> Unit) {
     var mode by remember { mutableStateOf(TileType.APP) }
-    var apps by remember { mutableStateOf<List<LaunchIntentResolver.Companion.InstalledApp>>(emptyList()) }
+    var apps by remember { mutableStateOf<List<com.cyprienbrisset.myportal.launch.InstalledApp>>(emptyList()) }
     var webLabel by remember { mutableStateOf("") }
     var webUrl by remember { mutableStateOf("") }
 

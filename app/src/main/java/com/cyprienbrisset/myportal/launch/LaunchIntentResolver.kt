@@ -3,6 +3,8 @@ package com.cyprienbrisset.myportal.launch
 import android.content.Context
 import android.content.Intent
 
+data class InstalledApp(val label: String, val packageName: String)
+
 /**
  * Resolves and launches installed apps. The [isLaunchable] seam keeps the
  * decision logic unit-testable without a real PackageManager.
@@ -25,8 +27,6 @@ class LaunchIntentResolver(private val isLaunchable: (String) -> Boolean) {
             context.startActivity(intent)
             return true
         }
-
-        data class InstalledApp(val label: String, val packageName: String)
 
         /** Lists launchable installed apps (for the tile picker). */
         fun installedLaunchableApps(context: Context): List<InstalledApp> {

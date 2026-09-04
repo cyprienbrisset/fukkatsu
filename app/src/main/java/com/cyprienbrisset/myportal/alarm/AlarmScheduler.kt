@@ -38,7 +38,7 @@ class AlarmScheduler(private val context: Context) {
         val triggerMillis = trigger.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val show = PendingIntent.getActivity(
             context, alarm.id.toInt(),
-            Intent(context, AlarmRingActivity::class.java),
+            Intent(context, AlarmRingActivity::class.java).putExtra(AlarmReceiver.EXTRA_ALARM_ID, alarm.id),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         am.setAlarmClock(AlarmManager.AlarmClockInfo(triggerMillis, show), firePendingIntent(alarm.id))
@@ -72,7 +72,7 @@ object AlarmSnooze {
         )
         val show = PendingIntent.getActivity(
             context, alarmId.toInt(),
-            Intent(context, AlarmRingActivity::class.java),
+            Intent(context, AlarmRingActivity::class.java).putExtra(AlarmReceiver.EXTRA_ALARM_ID, alarmId),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         am.setAlarmClock(AlarmManager.AlarmClockInfo(triggerMillis, show), fire)

@@ -37,7 +37,11 @@ class WebAppActivity : ComponentActivity() {
 
         setContentView(webView)
         goImmersive()
-        webView.loadUrl(url)
+        if (savedInstanceState != null) {
+            webView.restoreState(savedInstanceState)
+        } else {
+            webView.loadUrl(url)
+        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -54,6 +58,11 @@ class WebAppActivity : ComponentActivity() {
             or android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             or android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             or android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        webView.saveState(outState)
     }
 
     override fun onDestroy() {

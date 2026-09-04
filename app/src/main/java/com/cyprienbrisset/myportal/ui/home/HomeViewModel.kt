@@ -14,6 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -44,9 +45,10 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    val nextAlarm: StateFlow<LocalDateTime?> = alarmRepo.observeAll().map { list ->
-        list.filter { it.enabled }
-            .map { nextTriggerTime(it, LocalDateTime.now()) }
-            .minOrNull()
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    val nextAlarm: StateFlow<LocalDateTime?> =
+        combine(alarmRepo.observeAll(), now) { list, current ->
+            list.filter { it.enabled }
+                .map { nextTriggerTime(it, current) }
+                .minOrNull()
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 }
