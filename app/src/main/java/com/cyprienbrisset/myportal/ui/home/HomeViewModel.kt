@@ -51,4 +51,16 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
                 .map { nextTriggerTime(it, current) }
                 .minOrNull()
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    private val nowPlayingController = com.cyprienbrisset.myportal.media.NowPlayingController(app)
+    val nowPlaying = nowPlayingController.state
+    fun refreshNowPlaying() = nowPlayingController.refresh()
+    fun mediaToggle() = nowPlayingController.toggle()
+    fun mediaNext() = nowPlayingController.next()
+    fun mediaPrev() = nowPlayingController.prev()
+
+    override fun onCleared() {
+        nowPlayingController.dispose()
+        super.onCleared()
+    }
 }

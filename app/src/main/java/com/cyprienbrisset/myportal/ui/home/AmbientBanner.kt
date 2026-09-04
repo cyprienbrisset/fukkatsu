@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.data.weather.Weather
 import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
+import com.cyprienbrisset.myportal.ui.theme.Shu
 import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -30,11 +31,7 @@ fun AmbientBanner(
 ) {
     val time = now.format(DateTimeFormatter.ofPattern("HH:mm"))
     val date = now.format(DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.FRENCH))
-    val align = if (portrait) Alignment.CenterHorizontally else Alignment.Start
-
-    Column(modifier, horizontalAlignment = align) {
-        Text("M Y P O R T A L", color = SumiMuted, fontSize = 11.sp, letterSpacing = 5.sp)
-        Spacer(Modifier.height(if (portrait) 12.dp else 18.dp))
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(time, fontFamily = Mincho, fontWeight = FontWeight.Normal, color = Kinari, fontSize = if (portrait) 72.sp else 92.sp)
         Spacer(Modifier.height(12.dp))
         Text(date, color = Kinari, fontSize = 16.sp)
@@ -46,6 +43,17 @@ fun AmbientBanner(
                 append("⏰ " + nextAlarm.format(DateTimeFormatter.ofPattern("EEE HH:mm", Locale.FRENCH)))
             }
         }
-        if (wx.isNotEmpty()) Text(wx, color = SumiMuted, fontSize = 14.sp, textAlign = if (portrait) TextAlign.Center else TextAlign.Start)
+        if (wx.isNotEmpty()) Text(wx, color = SumiMuted, fontSize = 14.sp, textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+fun HomeBranding(portrait: Boolean, modifier: Modifier = Modifier) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            "復活", fontFamily = Mincho, fontWeight = FontWeight.Medium, color = Shu,
+            fontSize = if (portrait) 84.sp else 120.sp,
+        )
+        Text("F U K K A T S U", color = SumiMuted, fontSize = 13.sp, letterSpacing = 6.sp)
     }
 }

@@ -10,17 +10,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.NotificationsOff
+import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,10 +33,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.data.tile.TileType
 import com.cyprienbrisset.myportal.launch.LaunchIntentResolver
+import com.cyprienbrisset.myportal.system.DndController
+import com.cyprienbrisset.myportal.system.ScreenLock
+import com.cyprienbrisset.myportal.ui.sumi.SealIconButton
 import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
 import com.cyprienbrisset.myportal.ui.sumi.VerticalVermilionRule
 import com.cyprienbrisset.myportal.ui.sumi.WatermarkKanji
-import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import com.cyprienbrisset.myportal.web.WebAppActivity
 
 @Composable
@@ -43,6 +48,7 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
     val now by vm.now.collectAsStateWithLifecycle()
     val weather by vm.weather.collectAsStateWithLifecycle()
     val nextAlarm by vm.nextAlarm.collectAsStateWithLifecycle()
+    val nowPlaying by vm.nowPlaying.collectAsStateWithLifecycle()
 
     val launch: (TileEntity) -> Unit = { tile ->
         when (tile.type) {
@@ -59,23 +65,45 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val landscape = maxWidth > maxHeight
+        LaunchedEffect(now) { vm.refreshNowPlaying() }
         WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = (-64).dp, y = (-10).dp))
-        IconButton(
-            onClick = onOpenSettings,
-            modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 8.dp, end = 22.dp),
+        val dndOn = remember(now) { DndController.isGranted(ctx) && DndController.isDndOn(ctx) }
+        Row(
+            Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 16.dp, end = 30.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(
-                Icons.Rounded.Settings,
+            SealIconButton(
+                icon = if (dndOn) Icons.Rounded.NotificationsOff else Icons.Rounded.Notifications,
+                contentDescription = "Ne pas déranger",
+                active = dndOn,
+                onClick = { DndController.toggleOrRequest(ctx) },
+            )
+            SealIconButton(
+                icon = Icons.Rounded.PowerSettingsNew,
+                contentDescription = "Éteindre l'écran",
+                onClick = { ScreenLock.lockOrRequest(ctx) },
+            )
+            SealIconButton(
+                icon = Icons.Rounded.Settings,
                 contentDescription = "Réglages",
-                tint = SumiMuted,
-                modifier = Modifier.size(30.dp),
+                onClick = onOpenSettings,
             )
         }
 
         if (landscape) {
             Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
-                Box(Modifier.fillMaxHeight().weight(0.38f), contentAlignment = Alignment.CenterStart) {
-                    AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                Column(Modifier.fillMaxHeight().weight(0.38f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    HomeBranding(portrait = false, modifier = Modifier.padding(top = 8.dp))
+                    Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                            val np = nowPlaying
+                            if (np != null) {
+                                Spacer(Modifier.height(22.dp))
+                                NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
+                            }
+                        }
+                    }
                 }
                 VerticalVermilionRule(Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp), length = 220.dp)
                 Column(Modifier.fillMaxHeight().weight(0.62f).padding(start = 30.dp), verticalArrangement = Arrangement.Center) {
@@ -87,7 +115,14 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
         } else {
             Column(Modifier.fillMaxSize().padding(horizontal = 32.dp, vertical = 40.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(Modifier.height(20.dp))
+                HomeBranding(portrait = true)
+                Spacer(Modifier.height(24.dp))
                 AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = true)
+                val np = nowPlaying
+                if (np != null) {
+                    Spacer(Modifier.height(18.dp))
+                    NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
+                }
                 Spacer(Modifier.height(28.dp))
                 SectionLabel("アプリ", "MES APPS")
                 Spacer(Modifier.height(18.dp))
