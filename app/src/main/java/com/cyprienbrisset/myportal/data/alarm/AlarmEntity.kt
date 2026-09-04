@@ -15,4 +15,6 @@ data class AlarmEntity(
     val repeatDays: Int = 0,
     val label: String = "",
     val enabled: Boolean = true,
+    val ringtoneUri: String? = null,   // null = default alarm sound
+    val snoozeMinutes: Int = 10,
 )
