@@ -1,85 +1,82 @@
 package com.cyprienbrisset.myportal.ui.home
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.data.tile.TileType
 import com.cyprienbrisset.myportal.launch.LaunchIntentResolver
+import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
+import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
+import com.cyprienbrisset.myportal.ui.sumi.VerticalVermilionRule
+import com.cyprienbrisset.myportal.ui.sumi.WatermarkKanji
+import com.cyprienbrisset.myportal.web.WebAppActivity
 
 @Composable
-fun HomeScreen(
-    onOpenSettings: () -> Unit,
-    onAddTile: () -> Unit,
-    vm: HomeViewModel = viewModel(),
-) {
+fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewModel = viewModel()) {
     val ctx = LocalContext.current
     val tiles by vm.tiles.collectAsStateWithLifecycle()
     val now by vm.now.collectAsStateWithLifecycle()
     val weather by vm.weather.collectAsStateWithLifecycle()
     val nextAlarm by vm.nextAlarm.collectAsStateWithLifecycle()
 
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-        val isLandscape = maxWidth > maxHeight
-        val mode = homeLayoutFor(widthDp = maxWidth.value.toInt(), isLandscape = isLandscape)
+    val launch: (TileEntity) -> Unit = { tile ->
+        when (tile.type) {
+            TileType.APP -> {
+                val pkg = tile.packageName
+                if (pkg == null || !LaunchIntentResolver.launch(ctx, pkg))
+                    Toast.makeText(ctx, "App introuvable : ${tile.label}", Toast.LENGTH_SHORT).show()
+            }
+            TileType.WEB -> ctx.startActivity(
+                Intent(ctx, WebAppActivity::class.java).putExtra(WebAppActivity.EXTRA_URL, tile.url)
+            )
+        }
+    }
 
-        Column(Modifier.fillMaxSize()) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                IconButton(onClick = onOpenSettings) {
-                    Icon(Icons.Filled.Settings, contentDescription = "Réglages")
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val landscape = maxWidth > maxHeight
+        WatermarkKanji("墨", Modifier.align(Alignment.BottomEnd).offset(x = 40.dp, y = 60.dp))
+        HankoSeal("朱", Modifier.align(Alignment.TopEnd).padding(26.dp), onClick = onOpenSettings)
+
+        if (landscape) {
+            Row(Modifier.fillMaxSize().padding(start = 46.dp, top = 44.dp, bottom = 40.dp, end = 90.dp)) {
+                Box(Modifier.fillMaxHeight().weight(0.38f), contentAlignment = Alignment.CenterStart) {
+                    AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = false)
+                }
+                VerticalVermilionRule(Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp), length = 220.dp)
+                Column(Modifier.fillMaxHeight().weight(0.62f).padding(start = 30.dp), verticalArrangement = Arrangement.Center) {
+                    SectionLabel("アプリ", "MES APPS")
+                    Spacer(Modifier.height(22.dp))
+                    MedallionGrid(tiles, minCellWidth = 108.dp, onTileClick = launch, onAddClick = onAddTile)
                 }
             }
-            AmbientBanner(
-                now = now,
-                weather = weather,
-                nextAlarm = nextAlarm,
-                portrait = (mode == HomeLayoutMode.PORTRAIT),
-            )
-            Text(
-                "Mes apps",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 24.dp, top = 8.dp, bottom = 4.dp),
-            )
-            TileGrid(
-                tiles = tiles,
-                minTileWidth = mode.minTileWidthDp.dp,
-                onTileClick = { tile ->
-                    when (tile.type) {
-                        TileType.APP -> {
-                            val pkg = tile.packageName
-                            if (pkg == null || !LaunchIntentResolver.launch(ctx, pkg)) {
-                                Toast.makeText(ctx, "App introuvable : ${tile.label}", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        TileType.WEB -> {
-                            ctx.startActivity(
-                                android.content.Intent(ctx, com.cyprienbrisset.myportal.web.WebAppActivity::class.java)
-                                    .putExtra(com.cyprienbrisset.myportal.web.WebAppActivity.EXTRA_URL, tile.url)
-                            )
-                        }
-                    }
-                },
-                onAddClick = onAddTile,
-                modifier = Modifier.weight(1f),
-            )
+        } else {
+            Column(Modifier.fillMaxSize().padding(horizontal = 32.dp, vertical = 40.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(20.dp))
+                AmbientBanner(now, weather, nextAlarm = nextAlarm, portrait = true)
+                Spacer(Modifier.height(28.dp))
+                SectionLabel("アプリ", "MES APPS")
+                Spacer(Modifier.height(18.dp))
+                MedallionGrid(tiles, minCellWidth = 104.dp, onTileClick = launch, onAddClick = onAddTile, modifier = Modifier.weight(1f))
+            }
         }
     }
 }
