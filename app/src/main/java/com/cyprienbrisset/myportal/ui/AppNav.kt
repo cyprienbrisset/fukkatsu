@@ -17,7 +17,11 @@ object Routes {
 fun AppNav() {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Routes.HOME) {
-        composable(Routes.HOME) { Text("Home") }
+        composable(Routes.HOME) {
+            com.cyprienbrisset.myportal.ui.home.HomeScreen(
+                onOpenSettings = { nav.navigate(Routes.SETTINGS) }
+            )
+        }
         composable(Routes.SETTINGS) { Text("Settings") }
         composable(Routes.TILE_EDIT) { Text("Tiles") }
         composable(Routes.ALARMS) { Text("Alarms") }
