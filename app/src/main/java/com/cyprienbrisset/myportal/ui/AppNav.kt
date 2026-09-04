@@ -18,7 +18,8 @@ fun AppNav() {
     NavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
             com.cyprienbrisset.myportal.ui.home.HomeScreen(
-                onOpenSettings = { nav.navigate(Routes.SETTINGS) }
+                onOpenSettings = { nav.navigate(Routes.SETTINGS) },
+                onAddTile = { nav.navigate(Routes.TILE_EDIT) },
             )
         }
         composable(Routes.SETTINGS) {
