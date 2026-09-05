@@ -27,7 +27,13 @@ import com.cyprienbrisset.myportal.ui.theme.SumiLine
 import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onTiles: () -> Unit, onAlarms: () -> Unit, onWeather: () -> Unit) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    onTiles: () -> Unit,
+    onAlarms: () -> Unit,
+    onWeather: () -> Unit,
+    onFukkaLogin: () -> Unit,
+) {
     Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("朱", size = 40.dp, onClick = onBack)
@@ -37,6 +43,8 @@ fun SettingsScreen(onBack: () -> Unit, onTiles: () -> Unit, onAlarms: () -> Unit
         SettingRow("Tuiles", null, onTiles)
         SettingRow("Alarmes", null, onAlarms)
         SettingRow("Ville météo", null, onWeather)
+        // TEMPORARY spike entry point — remove after FukkaStore auth is validated.
+        SettingRow("FukkaStore login (test)", null, onFukkaLogin)
     }
 }
 

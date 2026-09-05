@@ -19,6 +19,7 @@ kotlinxSerialization = "1.7.3"
 coil = "2.7.0"
 coroutinesTest = "1.9.0"
 testCore = "1.6.1"
+gplayapi = "3.2.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "testCore" }
+gplayapi = { group = "com.gitlab.AuroraOSS", name = "gplayapi", version.ref = "gplayapi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
