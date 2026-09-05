@@ -58,7 +58,7 @@ fun HomeShell(onOpenSettings: () -> Unit, onAddTile: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(bottom = 30.dp),
+                .padding(bottom = 84.dp),
         )
     }
 }

@@ -1,10 +1,13 @@
 package com.cyprienbrisset.myportal.ui.google
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +22,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.cyprienbrisset.myportal.ui.google.GoogleWebSheet
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.data.tile.TileType
+import com.cyprienbrisset.myportal.integration.AppShortcuts
 import com.cyprienbrisset.myportal.integration.CalEvent
 import com.cyprienbrisset.myportal.integration.GoogleApps
 import com.cyprienbrisset.myportal.ui.home.TileIcon
@@ -49,6 +56,7 @@ import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
 import com.cyprienbrisset.myportal.ui.theme.OnShu
 import com.cyprienbrisset.myportal.ui.theme.Shu
+import com.cyprienbrisset.myportal.ui.theme.SumiLine
 import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import com.cyprienbrisset.myportal.ui.theme.SumiSurface
 import java.time.Instant
@@ -57,11 +65,17 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel()) {
     val ctx = LocalContext.current
+    val entries by vm.entries.collectAsStateWithLifecycle()
+    val canReadShortcuts by vm.canReadShortcuts.collectAsStateWithLifecycle()
     val events by vm.events.collectAsStateWithLifecycle()
     val loadedOnce by vm.loadedOnce.collectAsStateWithLifecycle()
+    val icsUrl by vm.icsUrl.collectAsStateWithLifecycle()
+
+    var webSheetKey by remember { mutableStateOf<String?>(null) }
 
     var hasCalendarPerm by remember {
         mutableStateOf(
@@ -73,8 +87,10 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
         hasCalendarPerm = granted
         if (granted) vm.loadEvents(System.currentTimeMillis())
     }
-    LaunchedEffect(hasCalendarPerm) {
-        if (hasCalendarPerm && vm.calendarInstalled) vm.loadEvents(System.currentTimeMillis())
+
+    LaunchedEffect(Unit) { vm.loadShortcuts() }
+    LaunchedEffect(hasCalendarPerm, icsUrl) {
+        if (hasCalendarPerm || !icsUrl.isNullOrBlank()) vm.loadEvents(System.currentTimeMillis())
     }
 
     Column(modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
@@ -84,58 +100,84 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
             Text("Google", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
         }
 
-        val meetPkg = vm.meetPackage
-        if (!vm.anyInstalled) {
-            Text(
-                "Installe Google Agenda, Chat ou Meet depuis le Store pour les retrouver ici.",
-                color = SumiMuted, fontSize = 15.sp,
-            )
-            return@Column
+        webSheetKey?.let { key ->
+            val url = if (key == "meet") "https://meet.google.com" else "https://chat.google.com"
+            GoogleWebSheet(poolKey = key, url = url, onDismiss = { webSheetKey = null })
         }
 
-        // Quick access
-        SectionLabel("アクセス", "ACCÈS RAPIDE")
-        Spacer(Modifier.height(14.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            if (vm.calendarInstalled) {
-                QuickCard(GoogleApps.CALENDAR, "Agenda", "Ouvrir") { GoogleApps.open(ctx, GoogleApps.CALENDAR) }
-            }
-            if (vm.chatInstalled) {
-                QuickCard(GoogleApps.CHAT, "Chat", "Ouvrir") { GoogleApps.open(ctx, GoogleApps.CHAT) }
-            }
-            if (meetPkg != null) {
-                QuickCard(meetPkg, "Meet", "Démarrer") { GoogleApps.startMeet(ctx) }
-            }
-        }
-
-        if (vm.calendarInstalled) {
-            Spacer(Modifier.height(26.dp))
-            SectionLabel("よてい", "PROCHAINS ÉVÉNEMENTS")
-            Spacer(Modifier.height(14.dp))
-            when {
-                !hasCalendarPerm -> {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            // Meet / Chat WebView tiles always visible.
+            item {
+                Spacer(Modifier.height(4.dp))
+                SectionLabel("つながり", "COMMUNICATION")
+                Spacer(Modifier.height(14.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    WebTile("Meet", onClick = { webSheetKey = "meet" }, modifier = Modifier.weight(1f))
+                    WebTile("Chat", onClick = { webSheetKey = "chat" }, modifier = Modifier.weight(1f))
+                }
+                if (!vm.anyInstalled) {
+                    Spacer(Modifier.height(12.dp))
                     Text(
-                        "Autorise l'accès à l'agenda pour afficher tes prochains événements.",
-                        color = SumiMuted, fontSize = 15.sp,
+                        "Installe Google Agenda, Chat ou Meet depuis le Store pour les retrouver ici.",
+                        color = SumiMuted, fontSize = 14.sp,
                     )
-                    Spacer(Modifier.height(14.dp))
-                    SumiPrimaryButton("Autoriser l'accès", onClick = {
-                        permLauncher.launch(Manifest.permission.READ_CALENDAR)
-                    })
                 }
-                loadedOnce && events.isEmpty() -> {
-                    Text("Aucun événement à venir.", color = SumiMuted, fontSize = 15.sp)
-                    Spacer(Modifier.height(14.dp))
-                    SumiPrimaryButton("Ouvrir l'agenda", onClick = { GoogleApps.open(ctx, GoogleApps.CALENDAR) })
-                }
-                else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(events, key = { "${it.id}-${it.begin}" }) { ev ->
-                        EventRow(
-                            ev = ev,
-                            onOpen = { GoogleApps.openEvent(ctx, ev.id, ev.begin) },
-                            onJoin = { ev.meetUrl?.let { GoogleApps.viewUrl(ctx, it) } },
+                Spacer(Modifier.height(8.dp))
+            }
+
+            // Long-press app shortcuts, per Google app.
+            if (!canReadShortcuts) {
+                item { DefaultLauncherHint(onOpenSettings = { ctx.startActivity(Intent(Settings.ACTION_HOME_SETTINGS)) }) }
+            }
+            items(entries, key = { it.pkg }) { entry ->
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        TileIcon(
+                            tile = TileEntity(type = TileType.APP, label = entry.name, packageName = entry.pkg, position = 0),
+                            size = 34.dp,
                         )
+                        Spacer(Modifier.width(12.dp))
+                        Text(entry.name, color = Kinari, fontFamily = Mincho, fontSize = 18.sp)
                     }
+                    Spacer(Modifier.height(10.dp))
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        if (entry.shortcuts.isEmpty()) {
+                            ShortcutChip("Ouvrir", onClick = { GoogleApps.open(ctx, entry.pkg) })
+                        } else {
+                            entry.shortcuts.forEach { sc ->
+                                ShortcutChip(sc.label, onClick = { AppShortcuts.launch(ctx, sc.pkg, sc.id) })
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Native live data: upcoming calendar events.
+            if (vm.calendarInstalled || !icsUrl.isNullOrBlank()) {
+                item {
+                    Spacer(Modifier.height(12.dp))
+                    SectionLabel("よてい", "PROCHAINS ÉVÉNEMENTS")
+                    Spacer(Modifier.height(14.dp))
+                    when {
+                        !hasCalendarPerm && vm.calendarInstalled && icsUrl.isNullOrBlank() -> Column {
+                            Text("Autorise l'accès à l'agenda pour afficher tes prochains événements.", color = SumiMuted, fontSize = 15.sp)
+                            Spacer(Modifier.height(14.dp))
+                            SumiPrimaryButton("Autoriser l'accès", onClick = { permLauncher.launch(Manifest.permission.READ_CALENDAR) })
+                        }
+                        !hasCalendarPerm && !vm.calendarInstalled && icsUrl.isNullOrBlank() -> Column {
+                            Text("Ajoute ton URL d'agenda Google dans les Réglages pour voir tes événements.", color = SumiMuted, fontSize = 15.sp)
+                        }
+                        loadedOnce && events.isEmpty() ->
+                            Text("Aucun événement à venir.", color = SumiMuted, fontSize = 15.sp)
+                        else -> {}
+                    }
+                }
+                items(events, key = { "${it.id}-${it.begin}" }) { ev ->
+                    EventRow(
+                        ev = ev,
+                        onOpen = { GoogleApps.openEvent(ctx, ev.id, ev.begin) },
+                        onJoin = { ev.meetUrl?.let { GoogleApps.viewUrl(ctx, it) } },
+                    )
                 }
             }
         }
@@ -143,17 +185,59 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
 }
 
 @Composable
-private fun QuickCard(pkg: String, label: String, action: String, onClick: () -> Unit) {
-    Column(
-        Modifier.width(150.dp).clip(RoundedCornerShape(18.dp)).background(SumiSurface)
-            .clickable { onClick() }.padding(vertical = 18.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+private fun WebTile(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier.clip(RoundedCornerShape(16.dp)).background(SumiSurface)
+            .border(1.dp, SumiLine, RoundedCornerShape(16.dp))
+            .clickable { onClick() }.padding(vertical = 20.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        TileIcon(tile = TileEntity(type = TileType.APP, label = label, packageName = pkg, position = 0), size = 52.dp)
+        Text(label, color = Kinari, fontFamily = Mincho, fontSize = 20.sp)
+    }
+}
+
+@Composable
+private fun GoogleSignInBanner(onSignIn: () -> Unit) {
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(SumiSurface)
+            .border(1.dp, SumiLine, RoundedCornerShape(16.dp)).padding(16.dp),
+    ) {
+        Text("Compte Google", color = Kinari, fontFamily = Mincho, fontSize = 17.sp)
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "Connecte ton compte Google pour accéder à Agenda, Meet et Chat avec ton identité.",
+            color = SumiMuted, fontSize = 14.sp,
+        )
         Spacer(Modifier.height(12.dp))
-        Text(label, color = Kinari, fontSize = 17.sp)
-        Spacer(Modifier.height(4.dp))
-        Text(action, color = Shu, fontFamily = Mincho, fontSize = 13.sp)
+        SumiPrimaryButton("Se connecter avec Google", onClick = onSignIn)
+    }
+}
+
+@Composable
+private fun DefaultLauncherHint(onOpenSettings: () -> Unit) {
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(SumiSurface)
+            .border(1.dp, SumiLine, RoundedCornerShape(16.dp)).padding(16.dp),
+    ) {
+        Text("Raccourcis des apps", color = Kinari, fontFamily = Mincho, fontSize = 17.sp)
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "Définis Fukkatsu comme launcher par défaut pour afficher et lancer les raccourcis (nouvel événement, nouvelle réunion, conversations…).",
+            color = SumiMuted, fontSize = 14.sp,
+        )
+        Spacer(Modifier.height(12.dp))
+        SumiPrimaryButton("Launcher par défaut", onClick = onOpenSettings)
+    }
+}
+
+@Composable
+private fun ShortcutChip(label: String, onClick: () -> Unit) {
+    Box(
+        Modifier.clip(RoundedCornerShape(14.dp)).background(SumiSurface)
+            .border(1.dp, SumiLine, RoundedCornerShape(14.dp))
+            .clickable { onClick() }.padding(horizontal = 18.dp, vertical = 12.dp),
+    ) {
+        Text(label, color = Kinari, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
