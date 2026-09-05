@@ -11,8 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import com.cyprienbrisset.myportal.ui.AppNav
 import com.cyprienbrisset.myportal.ui.theme.MyPortalTheme
+import com.cyprienbrisset.myportal.ui.theme.isDaytime
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import java.time.LocalTime
 
 class MainActivity : ComponentActivity() {
     private val notifPermission =
@@ -27,7 +34,10 @@ class MainActivity : ComponentActivity() {
         }
         enableEdgeToEdge()
         setContent {
-            MyPortalTheme {
+            val hour by remember {
+                flow { while (true) { emit(LocalTime.now().hour); delay(60_000L) } }
+            }.collectAsState(initial = LocalTime.now().hour)
+            MyPortalTheme(darkTheme = !isDaytime(hour)) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,

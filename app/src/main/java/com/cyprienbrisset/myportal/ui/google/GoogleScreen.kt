@@ -52,13 +52,10 @@ import com.cyprienbrisset.myportal.ui.home.TileIcon
 import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
 import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
 import com.cyprienbrisset.myportal.ui.sumi.SumiPrimaryButton
-import com.cyprienbrisset.myportal.ui.theme.Kinari
+import androidx.compose.material3.MaterialTheme
 import com.cyprienbrisset.myportal.ui.theme.Mincho
 import com.cyprienbrisset.myportal.ui.theme.OnShu
 import com.cyprienbrisset.myportal.ui.theme.Shu
-import com.cyprienbrisset.myportal.ui.theme.SumiLine
-import com.cyprienbrisset.myportal.ui.theme.SumiMuted
-import com.cyprienbrisset.myportal.ui.theme.SumiSurface
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -97,7 +94,7 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("会", size = 40.dp)
             Spacer(Modifier.width(14.dp))
-            Text("Google", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+            Text("Google", fontFamily = Mincho, color = MaterialTheme.colorScheme.onBackground, fontSize = 22.sp)
         }
 
         webSheetKey?.let { key ->
@@ -119,7 +116,7 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
                     Spacer(Modifier.height(12.dp))
                     Text(
                         "Installe Google Agenda, Chat ou Meet depuis le Store pour les retrouver ici.",
-                        color = SumiMuted, fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp,
                     )
                 }
                 Spacer(Modifier.height(8.dp))
@@ -137,7 +134,7 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
                             size = 34.dp,
                         )
                         Spacer(Modifier.width(12.dp))
-                        Text(entry.name, color = Kinari, fontFamily = Mincho, fontSize = 18.sp)
+                        Text(entry.name, color = MaterialTheme.colorScheme.onBackground, fontFamily = Mincho, fontSize = 18.sp)
                     }
                     Spacer(Modifier.height(10.dp))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -160,15 +157,15 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
                     Spacer(Modifier.height(14.dp))
                     when {
                         !hasCalendarPerm && vm.calendarInstalled && icsUrl.isNullOrBlank() -> Column {
-                            Text("Autorise l'accès à l'agenda pour afficher tes prochains événements.", color = SumiMuted, fontSize = 15.sp)
+                            Text("Autorise l'accès à l'agenda pour afficher tes prochains événements.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 15.sp)
                             Spacer(Modifier.height(14.dp))
                             SumiPrimaryButton("Autoriser l'accès", onClick = { permLauncher.launch(Manifest.permission.READ_CALENDAR) })
                         }
                         !hasCalendarPerm && !vm.calendarInstalled && icsUrl.isNullOrBlank() -> Column {
-                            Text("Ajoute ton URL d'agenda Google dans les Réglages pour voir tes événements.", color = SumiMuted, fontSize = 15.sp)
+                            Text("Ajoute ton URL d'agenda Google dans les Réglages pour voir tes événements.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 15.sp)
                         }
                         loadedOnce && events.isEmpty() ->
-                            Text("Aucun événement à venir.", color = SumiMuted, fontSize = 15.sp)
+                            Text("Aucun événement à venir.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 15.sp)
                         else -> {}
                     }
                 }
@@ -187,26 +184,26 @@ fun GoogleScreen(modifier: Modifier = Modifier, vm: GoogleViewModel = viewModel(
 @Composable
 private fun WebTile(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
-        modifier.clip(RoundedCornerShape(16.dp)).background(SumiSurface)
-            .border(1.dp, SumiLine, RoundedCornerShape(16.dp))
+        modifier.clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
             .clickable { onClick() }.padding(vertical = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(label, color = Kinari, fontFamily = Mincho, fontSize = 20.sp)
+        Text(label, color = MaterialTheme.colorScheme.onBackground, fontFamily = Mincho, fontSize = 20.sp)
     }
 }
 
 @Composable
 private fun GoogleSignInBanner(onSignIn: () -> Unit) {
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(SumiSurface)
-            .border(1.dp, SumiLine, RoundedCornerShape(16.dp)).padding(16.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp)).padding(16.dp),
     ) {
-        Text("Compte Google", color = Kinari, fontFamily = Mincho, fontSize = 17.sp)
+        Text("Compte Google", color = MaterialTheme.colorScheme.onBackground, fontFamily = Mincho, fontSize = 17.sp)
         Spacer(Modifier.height(6.dp))
         Text(
             "Connecte ton compte Google pour accéder à Agenda, Meet et Chat avec ton identité.",
-            color = SumiMuted, fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp,
         )
         Spacer(Modifier.height(12.dp))
         SumiPrimaryButton("Se connecter avec Google", onClick = onSignIn)
@@ -216,14 +213,14 @@ private fun GoogleSignInBanner(onSignIn: () -> Unit) {
 @Composable
 private fun DefaultLauncherHint(onOpenSettings: () -> Unit) {
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(SumiSurface)
-            .border(1.dp, SumiLine, RoundedCornerShape(16.dp)).padding(16.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp)).padding(16.dp),
     ) {
-        Text("Raccourcis des apps", color = Kinari, fontFamily = Mincho, fontSize = 17.sp)
+        Text("Raccourcis des apps", color = MaterialTheme.colorScheme.onBackground, fontFamily = Mincho, fontSize = 17.sp)
         Spacer(Modifier.height(6.dp))
         Text(
             "Définis Fukkatsu comme launcher par défaut pour afficher et lancer les raccourcis (nouvel événement, nouvelle réunion, conversations…).",
-            color = SumiMuted, fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp,
         )
         Spacer(Modifier.height(12.dp))
         SumiPrimaryButton("Launcher par défaut", onClick = onOpenSettings)
@@ -233,27 +230,27 @@ private fun DefaultLauncherHint(onOpenSettings: () -> Unit) {
 @Composable
 private fun ShortcutChip(label: String, onClick: () -> Unit) {
     Box(
-        Modifier.clip(RoundedCornerShape(14.dp)).background(SumiSurface)
-            .border(1.dp, SumiLine, RoundedCornerShape(14.dp))
+        Modifier.clip(RoundedCornerShape(14.dp)).background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(14.dp))
             .clickable { onClick() }.padding(horizontal = 18.dp, vertical = 12.dp),
     ) {
-        Text(label, color = Kinari, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(label, color = MaterialTheme.colorScheme.onBackground, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 private fun EventRow(ev: CalEvent, onOpen: () -> Unit, onJoin: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(SumiSurface)
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(MaterialTheme.colorScheme.surface)
             .clickable { onOpen() }.padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
             Text(formatEventTime(ev.begin, ev.allDay), color = Shu, fontSize = 13.sp)
             Spacer(Modifier.height(2.dp))
-            Text(ev.title, color = Kinari, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(ev.title, color = MaterialTheme.colorScheme.onBackground, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (!ev.location.isNullOrBlank()) {
-                Text(ev.location, color = SumiMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(ev.location, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
         if (ev.meetUrl != null) {

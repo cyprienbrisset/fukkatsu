@@ -27,10 +27,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.integration.RecentContact
-import com.cyprienbrisset.myportal.ui.theme.Kinari
+import androidx.compose.material3.MaterialTheme
 import com.cyprienbrisset.myportal.ui.theme.Mincho
 import com.cyprienbrisset.myportal.ui.theme.Shu
-import com.cyprienbrisset.myportal.ui.theme.SumiSurface
 
 @Composable
 fun RecentContactsStrip(contacts: List<RecentContact>, modifier: Modifier = Modifier) {
@@ -63,7 +62,7 @@ private fun ContactBubble(contact: RecentContact) {
         AvatarCircle(name = contact.name, avatar = contact.avatar)
         Text(
             contact.name,
-            color = Kinari,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 11.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -75,7 +74,7 @@ private fun ContactBubble(contact: RecentContact) {
 @Composable
 private fun AvatarCircle(name: String, avatar: Bitmap?) {
     Box(
-        Modifier.size(52.dp).clip(CircleShape).background(SumiSurface),
+        Modifier.size(52.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center,
     ) {
         if (avatar != null) {

@@ -28,14 +28,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.MaterialTheme
 import com.cyprienbrisset.myportal.ui.google.GoogleScreen
-import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
 import com.cyprienbrisset.myportal.ui.theme.OnShu
 import com.cyprienbrisset.myportal.ui.theme.Shu
-import com.cyprienbrisset.myportal.ui.theme.Sumi
-import com.cyprienbrisset.myportal.ui.theme.SumiLine
-import com.cyprienbrisset.myportal.ui.theme.SumiSurface
 
 /**
  * The home is a two-tab shell: the ambient launcher ("Accueil") and the Google integration page
@@ -70,7 +67,7 @@ private fun HomeTabBar(selected: Int, onSelect: (Int) -> Unit, modifier: Modifie
             .widthIn(max = 520.dp)
             .height(70.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(Sumi)
+            .background(MaterialTheme.colorScheme.background)
             .padding(6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
@@ -85,7 +82,7 @@ private fun HomeTab(kana: String, label: String, on: Boolean, onClick: () -> Uni
         modifier
             .fillMaxHeight()
             .clip(RoundedCornerShape(15.dp))
-            .background(if (on) Shu else SumiSurface)
+            .background(if (on) Shu else MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
             .padding(horizontal = 22.dp),
         horizontalArrangement = Arrangement.Center,
@@ -97,7 +94,7 @@ private fun HomeTab(kana: String, label: String, on: Boolean, onClick: () -> Uni
             label,
             fontFamily = Mincho,
             fontWeight = FontWeight.Medium,
-            color = if (on) OnShu else Kinari,
+            color = if (on) OnShu else MaterialTheme.colorScheme.onBackground,
             fontSize = 20.sp,
         )
     }
