@@ -19,7 +19,7 @@ fun AppNav() {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
-            com.cyprienbrisset.myportal.ui.home.HomeScreen(
+            com.cyprienbrisset.myportal.ui.home.HomeShell(
                 onOpenSettings = { nav.navigate(Routes.SETTINGS) },
                 onAddTile = { nav.navigate(Routes.TILE_EDIT) },
             )

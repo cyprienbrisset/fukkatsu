@@ -10,6 +10,7 @@ import com.cyprienbrisset.myportal.store.StoreApp
 import com.cyprienbrisset.myportal.store.StoreException
 import com.cyprienbrisset.myportal.store.files as fukkaFiles
 import com.cyprienbrisset.myportal.store.search as fukkaSearch
+import com.cyprienbrisset.myportal.store.topApps as fukkaTopApps
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,10 +32,29 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
     val isLoggedIn = account.isLoggedIn.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     private val _ui = MutableStateFlow<StoreUi>(StoreUi.Idle)
     val ui: StateFlow<StoreUi> = _ui
+    /** Curated "top compatible apps" shown when no search is active. */
+    private val _home = MutableStateFlow<StoreUi>(StoreUi.Idle)
+    val home: StateFlow<StoreUi> = _home
     private val _progress = MutableStateFlow<Map<String, Int>>(emptyMap())
     val progress: StateFlow<Map<String, Int>> = _progress
 
     fun logout() = viewModelScope.launch { account.logout() }
+
+    /** Loads the curated home once (cached). Safe to call on every screen entry. */
+    fun loadHome() {
+        if (_home.value is StoreUi.Results || _home.value is StoreUi.Loading) return
+        _home.value = StoreUi.Loading
+        viewModelScope.launch {
+            _home.value = try {
+                val ad = account.authData() ?: return@launch run { _home.value = StoreUi.Error("Non connecté") }
+                StoreUi.Results(fukkaTopApps(ad))
+            } catch (e: StoreException) { StoreUi.Error(e.message ?: "Erreur") }
+            catch (e: Exception) { StoreUi.Error("Erreur réseau") }
+        }
+    }
+
+    /** Clears the active search so the curated home is shown again. */
+    fun clearSearch() { _ui.value = StoreUi.Idle }
 
     fun search(query: String) {
         if (query.isBlank()) { _ui.value = StoreUi.Idle; return }
