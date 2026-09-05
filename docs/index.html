@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>復活 Fukkatsu — Launcher pour Meta Portal</title>
+  <meta name="description" content="Fukkatsu transforme le Meta Portal 2nd Gen en hub maison permanent. Esthétique encre japonaise, zéro dépendance Google." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sumi:      #0D0E12;
+      --sumi-2:    #191C23;
+      --sumi-3:    #23262F;
+      --ivory:     #ECE7DD;
+      --muted:     #9A9488;
+      --shu:       #C1272D;
+      --shu-dark:  #8B1A1F;
+      --serif:     'Noto Serif JP', serif;
+      --sans:      'Noto Sans JP', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--sumi);
+      color: var(--ivory);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* ─── Navbar ─────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,14,18,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(193,39,45,0.18);
+    }
+    nav .inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: var(--ivory);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--shu); }
+    nav a.cta {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--shu);
+      text-decoration: none;
+      border: 1px solid var(--shu-dark);
+      padding: 6px 16px;
+      border-radius: 3px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a.cta:hover { background: var(--shu); color: #fff; }
+
+    /* ─── Hero ───────────────────────────────────────────── */
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 110px 28px 90px;
+      text-align: center;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 0%, rgba(193,39,45,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(193,39,45,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .kanji {
+      font-family: var(--serif);
+      font-size: clamp(5rem, 14vw, 9rem);
+      font-weight: 300;
+      line-height: 1;
+      color: rgba(236,231,221,0.12);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.02em;
+    }
+    .hero-eyebrow {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--shu);
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 6vw, 3.6rem);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+      margin-bottom: 10px;
+    }
+    h1 .jp { font-weight: 300; color: var(--muted); margin-right: 0.3em; }
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 44px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--shu);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 32px;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #a01f23; }
+    .btn-secondary {
+      color: var(--ivory);
+      text-decoration: none;
+      padding: 12px 32px;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(236,231,221,0.2);
+      border-radius: 3px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--ivory); }
+
+    /* ─── Divider ─────────────────────────────────────────── */
+    .rule {
+      width: 40px;
+      height: 2px;
+      background: var(--shu);
+      margin: 0 auto 56px;
+    }
+
+    /* ─── Sections ───────────────────────────────────────── */
+    section {
+      padding: 72px 0;
+      border-top: 1px solid rgba(236,231,221,0.07);
+    }
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--shu);
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      font-weight: 400;
+      margin-bottom: 18px;
+      line-height: 1.3;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 0.97rem;
+      max-width: 600px;
+      margin-bottom: 44px;
+    }
+
+    /* ─── Feature grid ───────────────────────────────────── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 2px;
+      background: rgba(236,231,221,0.06);
+      border: 1px solid rgba(236,231,221,0.06);
+    }
+    .feature {
+      background: var(--sumi-2);
+      padding: 28px 24px;
+    }
+    .feature-icon {
+      font-size: 1.4rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .feature h3 {
+      font-family: var(--serif);
+      font-size: 0.95rem;
+      font-weight: 400;
+      margin-bottom: 8px;
+      color: var(--ivory);
+    }
+    .feature p {
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ─── Gestures table ─────────────────────────────────── */
+    .gestures {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .gestures tr {
+      border-bottom: 1px solid rgba(236,231,221,0.07);
+    }
+    .gestures td {
+      padding: 16px 0;
+      font-size: 0.9rem;
+      vertical-align: top;
+    }
+    .gestures td:first-child {
+      width: 46%;
+      padding-right: 28px;
+      font-family: var(--serif);
+      font-size: 0.88rem;
+      color: var(--ivory);
+    }
+    .gesture-tag {
+      display: inline-block;
+      background: rgba(193,39,45,0.15);
+      color: var(--shu);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 3px 8px;
+      border-radius: 2px;
+      margin-bottom: 5px;
+    }
+    .gestures td:last-child { color: var(--muted); font-size: 0.85rem; }
+
+    /* ─── Theme split ────────────────────────────────────── */
+    .theme-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    .theme-card {
+      padding: 36px 28px;
+    }
+    .theme-card.night { background: #0D0E12; border: 1px solid rgba(255,255,255,0.06); }
+    .theme-card.day   { background: #F2EDE3; border: 1px solid rgba(0,0,0,0.08); }
+    .theme-card h3 {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+    .theme-card.night h3 { color: #ECE7DD; }
+    .theme-card.day   h3 { color: #14161C; }
+    .theme-card .time {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .theme-card.night .time { color: #9A9488; }
+    .theme-card.day   .time { color: #6E6B61; }
+    .swatch-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .theme-desc { font-size: 0.8rem; }
+    .theme-card.night .theme-desc { color: #9A9488; }
+    .theme-card.day   .theme-desc { color: #6E6B61; }
+    .accent-bar {
+      margin-top: 20px;
+      height: 3px;
+      background: var(--shu);
+      border-radius: 2px;
+    }
+
+    /* ─── Install block ──────────────────────────────────── */
+    .install-block {
+      background: var(--sumi-2);
+      border: 1px solid rgba(236,231,221,0.08);
+      border-left: 3px solid var(--shu);
+      padding: 28px 28px 24px;
+      border-radius: 0 4px 4px 0;
+    }
+    .install-block pre {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.82rem;
+      color: #a8c7a0;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-top: 16px;
+    }
+    .install-block .comment { color: var(--muted); }
+    .install-steps {
+      list-style: none;
+      counter-reset: steps;
+      margin-top: 28px;
+    }
+    .install-steps li {
+      counter-increment: steps;
+      display: flex;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(236,231,221,0.05);
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .install-steps li::before {
+      content: counter(steps);
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      background: var(--shu);
+      color: #fff;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-top: 1px;
+    }
+    .install-steps li strong { color: var(--ivory); }
+
+    /* ─── Footer ─────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid rgba(236,231,221,0.07);
+      padding: 44px 28px;
+      text-align: center;
+    }
+    footer .kanji-sm {
+      font-family: var(--serif);
+      font-size: 2.5rem;
+      color: rgba(236,231,221,0.12);
+      display: block;
+      margin-bottom: 12px;
+    }
+    footer p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    footer a { color: var(--shu); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ─── Responsive ─────────────────────────────────────── */
+    @media (max-width: 580px) {
+      .theme-split { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; align-items: center; }
+      .gestures td:first-child { width: 50%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────── -->
+<nav>
+  <div class="inner">
+    <a class="nav-logo" href="#"><span>復活</span> Fukkatsu</a>
+    <a class="cta" href="https://github.com/cyprienbrisset/fukkatsu" target="_blank" rel="noopener">GitHub →</a>
+  </div>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────  -->
+<header>
+  <div class="kanji" aria-hidden="true">復活</div>
+  <div class="container" style="position:relative;z-index:1;">
+    <p class="hero-eyebrow">Meta Portal 2nd Gen · Android 10</p>
+    <h1><span class="jp">復活</span> Fukkatsu</h1>
+    <p class="hero-sub">
+      Un launcher maison conçu pour le Meta Portal — esthétique encre japonaise,
+      affichage ambiant permanent, sans aucune dépendance Google.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://github.com/cyprienbrisset/fukkatsu/releases" target="_blank" rel="noopener">Télécharger</a>
+      <a class="btn-secondary" href="https://github.com/cyprienbrisset/fukkatsu" target="_blank" rel="noopener">Voir le code</a>
+    </div>
+  </div>
+</header>
+
+<div class="rule"></div>
+
+<!-- ── Fonctionnalités ───────────────────────────────────────  -->
+<section>
+  <div class="container">
+    <p class="section-label">Fonctionnalités</p>
+    <h2>Tout ce dont vous avez besoin sur un seul écran</h2>
+    <p class="lead">
+      Fukkatsu remplace l'interface stock du Portal par un hub maison pensé pour rester
+      allumé en permanence, visible d'un coup d'œil, utilisable d'un seul geste.
+    </p>
+
+    <div class="features">
+      <div class="feature">
+        <span class="feature-icon">🕐</span>
+        <h3>Horloge ambiante</h3>
+        <p>Heure, date, météo en direct et prochain réveil — toujours visibles, en typographie Mincho.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📱</span>
+        <h3>Grille d'apps</h3>
+        <p>Raccourcis personnalisables en médaillons. Appui long pour accéder aux actions rapides et réorganiser.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🎵</span>
+        <h3>Lecture en cours</h3>
+        <p>Pochette, titre, commandes et barre de progression. Tap pour ouvrir le lecteur directement.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">👥</span>
+        <h3>Contacts récents</h3>
+        <p>Vos six derniers contacts Messenger ou WhatsApp affichés sur l'écran principal.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📅</span>
+        <h3>Agenda Google</h3>
+        <p>Prochains événements avec bouton Rejoindre pour les réunions Meet, sans aucune app Google requise.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">⏰</span>
+        <h3>Réveil intégré</h3>
+        <p>Planificateur complet : heure, jours, sonnerie personnalisée, montée en volume progressive.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🛒</span>
+        <h3>FukkaStore</h3>
+        <p>Accès au catalogue Google Play sans GMS. Une connexion Google, une pression pour installer.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🔆</span>
+        <h3>Contrôles système</h3>
+        <p>Luminosité par glissement du bord droit, Ne Pas Déranger configurable, extinction d'écran.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Gestes ─────────────────────────────────────────────────  -->
+<section>
+  <div class="container">
+    <p class="section-label">Gestes</p>
+    <h2>Tout contrôler sans quitter l'écran</h2>
+    <p class="lead">Cinq gestes couvrent la navigation, les réglages et le multitâche.</p>
+
+    <table class="gestures">
+      <tbody>
+        <tr>
+          <td>
+            <span class="gesture-tag">Logo</span><br>
+            Glisser vers le haut
+          </td>
+          <td>Overlay de recherche — trouvez n'importe quelle app installée instantanément.</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="gesture-tag">Logo</span><br>
+            Glisser vers le bas
+          </td>
+          <td>Bascule Ne Pas Déranger, avec choix de durée (30 min, 1 h, 2 h, indéfini).</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="gesture-tag">Écran entier</span><br>
+            Écarter deux doigts
+          </td>
+          <td>Vue multitâche : cartes des apps récentes avec gradient par app. Glissez vers le haut pour retirer.</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="gesture-tag">Bord droit</span><br>
+            Glisser de haut en bas
+          </td>
+          <td>Curseur de luminosité vertical — avec indicateur visuel auto-masqué après 2 secondes.</td>
+        </tr>
+        <tr>
+          <td>
+            <span class="gesture-tag">Tuile</span><br>
+            Appui long
+          </td>
+          <td>Panneau d'actions : raccourcis de l'app, déplacer vers le haut/bas, supprimer.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Thèmes ─────────────────────────────────────────────────  -->
+<section>
+  <div class="container">
+    <p class="section-label">Thèmes</p>
+    <h2>Deux palettes, une seule âme</h2>
+    <p class="lead">Le thème bascule automatiquement selon l'heure. L'accent vermillon <strong>朱</strong> reste invariant.</p>
+
+    <div class="theme-split">
+      <div class="theme-card night">
+        <h3>🌙 Sumi</h3>
+        <p class="time">Nuit · 20h00 – 06h59</p>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#0D0E12;border:1px solid rgba(255,255,255,0.1)" title="#0D0E12"></div>
+          <div class="swatch" style="background:#191C23" title="#191C23"></div>
+          <div class="swatch" style="background:#ECE7DD" title="#ECE7DD"></div>
+          <div class="swatch" style="background:#9A9488" title="#9A9488"></div>
+          <div class="swatch" style="background:#C1272D" title="#C1272D"></div>
+        </div>
+        <p class="theme-desc">Fond quasi-noir <code style="color:#9A9488">#0D0E12</code>, texte ivoire <code style="color:#9A9488">#ECE7DD</code>. Encre de Chine et parchemin nocturne.</p>
+        <div class="accent-bar"></div>
+      </div>
+      <div class="theme-card day">
+        <h3 style="color:#14161C">☀️ Washi</h3>
+        <p class="time">Jour · 07h00 – 19h59</p>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#F2EDE3;border:1px solid rgba(0,0,0,0.1)" title="#F2EDE3"></div>
+          <div class="swatch" style="background:#E6E1D6" title="#E6E1D6"></div>
+          <div class="swatch" style="background:#14161C" title="#14161C"></div>
+          <div class="swatch" style="background:#6E6B61" title="#6E6B61"></div>
+          <div class="swatch" style="background:#C1272D" title="#C1272D"></div>
+        </div>
+        <p class="theme-desc" style="color:#6E6B61">Fond parchemin <code style="color:#6E6B61">#F2EDE3</code>, texte encre <code style="color:#6E6B61">#14161C</code>. Papier Washi et calligraphie au soleil.</p>
+        <div class="accent-bar"></div>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:18px;font-size:0.78rem;color:var(--muted);">
+      Typographie <strong style="color:var(--ivory)">Noto Serif JP</strong> (famille Mincho) — même police que dans l'app.
+    </p>
+  </div>
+</section>
+
+<!-- ── Installation ───────────────────────────────────────────  -->
+<section>
+  <div class="container">
+    <p class="section-label">Installation</p>
+    <h2>Prêt en une commande</h2>
+    <p class="lead">Un script automatise l'intégralité du provisioning.</p>
+
+    <ol class="install-steps">
+      <li><div><strong>Activez le débogage USB</strong> sur votre Portal — Réglages → À propos → taper 7× sur "Numéro de build", puis activer le débogage.</div></li>
+      <li><div><strong>Branchez le Portal</strong> à votre Mac via USB. Acceptez la demande de débogage sur l'écran du Portal.</div></li>
+      <li><div><strong>Clonez le dépôt</strong> et exécutez le script de provision — il compile, installe et configure tout.</div></li>
+    </ol>
+
+    <div class="install-block" style="margin-top:28px;">
+      <span style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">Terminal</span>
+      <pre><span class="comment"># Cloner</span>
+git clone https://github.com/cyprienbrisset/fukkatsu.git
+cd fukkatsu
+
+<span class="comment"># Construire, installer et configurer le Portal</span>
+bash scripts/provision-portal.sh --disable-verifier --set-launcher</pre>
+    </div>
+
+    <p style="margin-top:20px;font-size:0.82rem;color:var(--muted);">
+      Nécessite <strong style="color:var(--ivory)">Android Studio</strong> (pour son JDK intégré) et <strong style="color:var(--ivory)">ADB</strong> dans <code>~/Library/Android/sdk/platform-tools/</code>.
+    </p>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────  -->
+<footer>
+  <span class="kanji-sm" aria-hidden="true">墨</span>
+  <p>
+    MIT — Copyright © 2024–2026 <a href="https://github.com/cyprienbrisset" target="_blank" rel="noopener">Cyprien Brisset</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/cyprienbrisset/fukkatsu" target="_blank" rel="noopener">GitHub</a>
+  </p>
+</footer>
+
+</body>
+</html>

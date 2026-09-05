@@ -2,182 +2,101 @@
 
 # 復活 Fukkatsu
 
-**A custom Android home launcher for the Meta Portal 2nd Gen**
+**Launcher maison pour Meta Portal 2nd Gen**
 
-*Japanese ink aesthetics · Always-on ambient display · No GMS required*
+*Encre japonaise · Ambiant permanent · Sans Google Services*
 
 ---
 
-![Android](https://img.shields.io/badge/Android-10%20%28API%2029%29-3DDC84?style=for-the-badge&logo=android&logoColor=white)
-![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
-![Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202024-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-C1272D?style=for-the-badge)
-![Platform](https://img.shields.io/badge/Device-Meta%20Portal%202nd%20Gen-0866FF?style=for-the-badge&logo=meta&logoColor=white)
+[![Android 10](https://img.shields.io/badge/Android-10-3DDC84?style=flat-square&logo=android&logoColor=white)](https://github.com/cyprienbrisset/fukkatsu)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://github.com/cyprienbrisset/fukkatsu)
+[![Licence MIT](https://img.shields.io/badge/Licence-MIT-C1272D?style=flat-square)](LICENSE)
 
 </div>
 
 ---
 
-## What is Fukkatsu?
-
-**復活** (*fukkatsu*, "revival") replaces the stock Meta Portal UI with a launcher built around Japanese stationery aesthetics — deep Sumi ink at night, warm Washi parchment by day. Designed as an always-on ambient display for a home hub, it runs fully offline with no Google Mobile Services dependency.
+**復活** (*fukkatsu*, « renaissance ») transforme un Meta Portal 2nd Gen en hub maison permanent. L'interface s'inspire de la papeterie japonaise : encre Sumi profonde la nuit, parchemin Washi chaud le jour. Tout fonctionne sans connexion Google — pas de compte, pas de Play Store requis.
 
 ---
 
-## Features
+## Ce que vous voyez au quotidien
 
-### 🏠 Home Screen
+**Une horloge ambiante** occupe la gauche de l'écran en permanence — heure, date, météo en direct et prochain réveil d'un seul coup d'œil. Quand de la musique joue, la pochette et les commandes apparaissent dessous. Les six derniers contacts Messenger ou WhatsApp avec qui vous avez échangé sont également affichés.
 
-| Feature | Description |
-|---|---|
-| **Tile grid** | Customizable app shortcuts in a medallion-style grid |
-| **Spring press** | Tiles bounce with a medium-bouncy spring on tap (0.86 scale) |
-| **Ambient clock** | Full-screen Mincho-font time, date, weather and next alarm |
-| **Recent contacts** | Last 6 Messenger/WhatsApp contacts via `NotificationListenerService` |
-| **Now Playing bar** | Media controls, seek bar, album art — tap to open the player |
-| **Volume slider** | Quick system media volume adjustment |
+**La grille d'apps** à droite regroupe vos raccourcis en médaillons. Un tap lance l'app, un appui long ouvre un panneau d'actions rapides (raccourcis de l'app, réordonner, supprimer).
 
-### 🛒 FukkaStore
-
-| Feature | Description |
-|---|---|
-| **Google Play catalog** | Browse and install apps without GMS using [gplayapi](https://github.com/whyorean/GPlayApi) |
-| **Auth** | Google account sign-in via AC2DM OAuth2 exchange, AAS token stored in DataStore |
-| **Curated home** | Top free compatible apps, category chips, and full search |
-
-### ⚙️ System
-
-| Feature | Description |
-|---|---|
-| **Alarms** | Room-backed alarm scheduler with volume ramp and custom ringtone |
-| **DND** | Do-not-disturb toggle with configurable duration |
-| **Screen lock** | Device Admin screen-off |
-| **Weather** | Open-Meteo weather via configurable coordinates |
+Le thème bascule automatiquement entre mode nuit (Sumi) et mode jour (Washi) selon l'heure — 20h pour la nuit, 7h pour le jour. L'accent rouge vermillon **朱** reste constant.
 
 ---
 
-## Day / Night theming
+## Gestes
 
-Fukkatsu switches color schemes automatically based on the device clock (checked every minute):
+| Geste | Effet |
+|---|---|
+| Glisser **vers le haut** sur le logo | Recherche rapide parmi toutes les apps installées |
+| Glisser **vers le bas** sur le logo | Activer / couper le mode Ne Pas Déranger |
+| **Écarter deux doigts** (pinch-out) | Vue multitâche : cartes des apps récentes, glisser vers le haut pour fermer |
+| **Glisser le bord droit** de l'écran | Régler la luminosité (curseur vertical) |
+| **Appui long** sur une tuile | Actions rapides : raccourcis, déplacer, supprimer |
+
+---
+
+## FukkaStore — installer des apps sans Google
+
+Le Portal n'a pas de Play Store. FukkaStore comble ce manque : connectez votre compte Google une seule fois, puis parcourez et installez des applications directement depuis le catalogue officiel Google Play.
+
+- Navigation par catégories (Productivité, Musique, Réseaux sociaux…)
+- Recherche en texte libre
+- Une seule pression pour télécharger et installer
+- Filtre automatique des apps incompatibles avec le Portal
+
+---
+
+## Intégration Google
+
+Un onglet dédié regroupe les accès Google :
+
+- **Agenda** — vos prochains événements, avec un bouton *Rejoindre* direct pour les réunions Google Meet
+- **Raccourcis** — Chat, Meet et Calendar s'ouvrent en un tap si l'app est installée
+
+---
+
+## Réveil intégré
+
+Un gestionnaire de réveils complet, intégré au launcher : création par heure et jours de la semaine, sonnerie personnalisable, montée en volume progressive. Le prochain réveil est affiché en permanence sur l'écran ambiant.
+
+---
+
+## Thèmes
 
 <table>
 <tr>
-<th align="center">🌙 Sumi — Night (20:00 – 06:59)</th>
-<th align="center">☀️ Washi — Day (07:00 – 19:59)</th>
+<th align="center">🌙 Sumi — Nuit (20h – 7h)</th>
+<th align="center">☀️ Washi — Jour (7h – 20h)</th>
 </tr>
 <tr>
-<td>
-
-| Token | Color | Hex |
-|---|---|---|
-| Background | ![#0D0E12](https://img.shields.io/badge/-%230D0E12-0D0E12) | `#0D0E12` |
-| Primary text | ![#ECE7DD](https://img.shields.io/badge/-%23ECE7DD-ECE7DD) | `#ECE7DD` |
-| Muted text | ![#9A9488](https://img.shields.io/badge/-%239A9488-9A9488) | `#9A9488` |
-| Surface | ![#191C23](https://img.shields.io/badge/-%23191C23-191C23) | `#191C23` |
-
-</td>
-<td>
-
-| Token | Color | Hex |
-|---|---|---|
-| Background | ![#F2EDE3](https://img.shields.io/badge/-%23F2EDE3-F2EDE3) | `#F2EDE3` |
-| Primary text | ![#14161C](https://img.shields.io/badge/-%2314161C-14161C) | `#14161C` |
-| Muted text | ![#6E6B61](https://img.shields.io/badge/-%236E6B61-6E6B61) | `#6E6B61` |
-| Surface | ![#E6E1D6](https://img.shields.io/badge/-%23E6E1D6-E6E1D6) | `#E6E1D6` |
-
-</td>
+<td>Fond quasi-noir <code>#0D0E12</code>, texte ivoire <code>#ECE7DD</code></td>
+<td>Fond parchemin <code>#F2EDE3</code>, texte encre <code>#14161C</code></td>
 </tr>
 </table>
 
-> **Accent — invariant across modes:** ![Shu](https://img.shields.io/badge/Shu%20vermilion-%23C1272D-C1272D) `#C1272D`
-
-Typography uses **Noto Serif JP** (Mincho family) throughout.
+Typographie **Noto Serif JP** (Mincho). Accent vermillon **朱** `#C1272D` invariant.
 
 ---
 
-## Architecture
+## Installation rapide
 
-```
-com.cyprienbrisset.myportal
-├── 🔔 alarm/          Scheduling, foreground service, volume ramp, boot receiver
-├── 💾 data/           Room (tiles, alarms) · DataStore (settings) · Weather models
-├── 🔗 integration/    Recent contacts via NotificationListenerService
-├── 🚀 launch/         Intent resolution for tile taps
-├── 🎵 media/          Now Playing via MediaController
-├── 🛒 store/          FukkaStore: AC2DM auth · APK download/install · gplayapi wrappers
-├── ⚙️  system/         DND · Screen lock · NotificationListenerService · Device admin
-└── 🖌️  ui/
-    ├── alarms/         Alarm list + editor
-    ├── home/           HomeScreen · AmbientBanner · MedallionGrid · NowPlayingBar
-    ├── settings/       Settings · Weather · Tile editor · Installed apps
-    ├── store/          StoreScreen
-    ├── sumi/           Design system (Medallion · HankoSeal · SectionLabel…)
-    └── theme/          Color palettes · Typography · MaterialTheme wrappers
-```
-
-**Stack**
-
-![Room](https://img.shields.io/badge/Room-Database-4285F4?style=flat-square&logo=android)
-![DataStore](https://img.shields.io/badge/DataStore-Preferences-4285F4?style=flat-square&logo=android)
-![OkHttp](https://img.shields.io/badge/OkHttp-HTTP%20client-48BB78?style=flat-square)
-![gplayapi](https://img.shields.io/badge/gplayapi-Play%20catalog-EA4335?style=flat-square)
-![Navigation Compose](https://img.shields.io/badge/Navigation-Compose-7F52FF?style=flat-square&logo=jetpackcompose)
-
----
-
-## Device
-
-> Designed and tested exclusively on the **Meta Portal 2nd Gen** (codename *aloha*).
-
-| Property | Value |
-|---|---|
-| OS | Android 10 (API 29) |
-| Resolution | 1280 × 800 landscape |
-| GMS | ❌ None |
-| ADB serial (example) | `2221B01C9C02NQ` |
-
-Because the Portal has no functional GMS, the package verifier must be disabled for sideloaded APKs — the provision script handles this automatically.
-
----
-
-## Setup
-
-### Prerequisites
-
-- **Android Studio** (Hedgehog or later) — its bundled JBR is used as `JAVA_HOME`
-- **ADB** at `~/Library/Android/sdk/platform-tools/adb`
-- Portal with **USB Debugging** enabled
-
-### First-time provisioning
+Le Portal doit avoir le **débogage USB** activé. Branchez-le et lancez :
 
 ```bash
-# Builds APK, installs, grants DND + Device Admin, sets as launcher,
-# disables package verifier so FukkaStore can install apps.
-bash scripts/provision-portal.sh 2221B01C9C02NQ --disable-verifier --set-launcher
+bash scripts/provision-portal.sh --disable-verifier --set-launcher
 ```
 
-### Incremental update
-
-```bash
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-./gradlew :app:assembleDebug
-adb -s 2221B01C9C02NQ install -r app/build/outputs/apk/debug/app-debug.apk
-```
-
-### FukkaStore sign-in
-
-Open the **Store** tab → **Se connecter** → enter your Google account credentials. The app exchanges an OAuth token for an AAS token via AC2DM and uses gplayapi to query the Play catalog. Only the AAS token is persisted (DataStore), no password is stored.
-
-### Google Calendar (ICS)
-
-Go to **Settings → Agenda Google**, paste your Google Calendar ICS URL (from calendar.google.com → share → get shareable link). Events are fetched and parsed without any third-party library.
+Ce script construit l'APK, l'installe, accorde les permissions nécessaires (Ne Pas Déranger, luminosité, administrateur d'appareil) et définit Fukkatsu comme launcher par défaut.
 
 ---
 
-## License
+## Licence
 
-```
-MIT License — Copyright (c) 2024-2026 Cyprien Brisset
-```
-
-See [LICENSE](LICENSE) for the full text.
+MIT — Copyright © 2024–2026 Cyprien Brisset
