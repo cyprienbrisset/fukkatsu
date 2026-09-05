@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Exact alarms: USE_EXACT_ALARM is auto-granted for genuine alarm-clock apps (API 33+);
          SCHEDULE_EXACT_ALARM covers API 31-32. Not needed on the Portal (API 29) but required on newer devices. -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
@@ -94,6 +95,10 @@
 
         <receiver android:name=".system.DndOffReceiver" android:exported="false">
             <intent-filter><action android:name="com.cyprienbrisset.myportal.DND_OFF" /></intent-filter>
+        </receiver>
+
+        <receiver android:name=".store.InstallResultReceiver" android:exported="false">
+            <intent-filter><action android:name="com.cyprienbrisset.myportal.INSTALL_STATUS" /></intent-filter>
         </receiver>
 
         <receiver android:name=".alarm.AlarmReceiver" android:exported="false" />
