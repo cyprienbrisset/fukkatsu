@@ -100,6 +100,11 @@ private fun FukkaLoginScreen() {
                                         step = "search"
                                         val names = searchTitles(authData, "spotify")
                                         status = "OK n=${names.size} $names"
+                                        FukkaAccount(context).save(email, aas)
+                                        (context as? android.app.Activity)?.let {
+                                            it.setResult(android.app.Activity.RESULT_OK)
+                                            it.finish()
+                                        }
                                     } catch (e: Exception) {
                                         status = "ERREUR ($step): ${e.message}"
                                     }
