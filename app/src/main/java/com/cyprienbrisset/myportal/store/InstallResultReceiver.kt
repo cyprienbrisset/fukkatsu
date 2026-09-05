@@ -8,6 +8,7 @@ import android.widget.Toast
 
 class InstallResultReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        val pkg = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
         when (intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -1)) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                 @Suppress("DEPRECATION")
@@ -15,8 +16,14 @@ class InstallResultReceiver : BroadcastReceiver() {
                 confirm?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 if (confirm != null) context.startActivity(confirm)
             }
-            PackageInstaller.STATUS_SUCCESS -> Toast.makeText(context, "Installé", Toast.LENGTH_SHORT).show()
-            else -> Toast.makeText(context, "Échec install : ${intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)}", Toast.LENGTH_LONG).show()
+            PackageInstaller.STATUS_SUCCESS -> {
+                Toast.makeText(context, "Installé", Toast.LENGTH_SHORT).show()
+                InstallEvents.emit(InstallEvent(pkg, success = true))
+            }
+            else -> {
+                Toast.makeText(context, "Échec install : ${intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)}", Toast.LENGTH_LONG).show()
+                InstallEvents.emit(InstallEvent(pkg, success = false))
+            }
         }
     }
     companion object { const val ACTION = "com.cyprienbrisset.myportal.INSTALL_STATUS" }

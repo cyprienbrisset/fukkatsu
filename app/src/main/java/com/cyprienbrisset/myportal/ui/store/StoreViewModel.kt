@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.cyprienbrisset.myportal.store.ApkDownloader
 import com.cyprienbrisset.myportal.store.ApkInstaller
 import com.cyprienbrisset.myportal.store.FukkaAccount
+import com.cyprienbrisset.myportal.store.InstallEvents
 import com.cyprienbrisset.myportal.store.StoreApp
 import com.cyprienbrisset.myportal.store.StoreException
 import com.cyprienbrisset.myportal.store.files as fukkaFiles
@@ -24,6 +25,13 @@ sealed interface StoreUi {
     data class Error(val message: String) : StoreUi
 }
 
+/** Install progress sentinels stored in [StoreViewModel.progress] per package. */
+object InstallProgress {
+    const val INSTALLING = 100 // downloaded, system installer running
+    const val INSTALLED = 101  // system reported success
+    const val FAILED = -1
+}
+
 class StoreViewModel(app: Application) : AndroidViewModel(app) {
     private val account = FukkaAccount(app)
     private val downloader = ApkDownloader(app)
@@ -37,6 +45,18 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
     val home: StateFlow<StoreUi> = _home
     private val _progress = MutableStateFlow<Map<String, Int>>(emptyMap())
     val progress: StateFlow<Map<String, Int>> = _progress
+
+    init {
+        // The manifest InstallResultReceiver reports the system install outcome here so the
+        // card can leave the "Installation…" state.
+        viewModelScope.launch {
+            InstallEvents.events.collect { e ->
+                val pkg = e.packageName ?: return@collect
+                _progress.value = _progress.value +
+                    (pkg to if (e.success) InstallProgress.INSTALLED else InstallProgress.FAILED)
+            }
+        }
+    }
 
     fun logout() = viewModelScope.launch { account.logout() }
 

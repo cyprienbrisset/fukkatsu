@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.cyprienbrisset.myportal.launch.LaunchIntentResolver
 import com.cyprienbrisset.myportal.store.FukkaLoginActivity
 import com.cyprienbrisset.myportal.store.StoreApp
 import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
@@ -115,12 +116,22 @@ fun StoreScreen(onBack: () -> Unit, showBack: Boolean = true, vm: StoreViewModel
         }
         Spacer(Modifier.height(14.dp))
 
-        AppResults(state = if (searching) ui else home, progress = progress, onInstall = { vm.install(it) })
+        AppResults(
+            state = if (searching) ui else home,
+            progress = progress,
+            onInstall = { vm.install(it) },
+            onOpen = { LaunchIntentResolver.launch(ctx, it.packageName) },
+        )
     }
 }
 
 @Composable
-private fun AppResults(state: StoreUi, progress: Map<String, Int>, onInstall: (StoreApp) -> Unit) {
+private fun AppResults(
+    state: StoreUi,
+    progress: Map<String, Int>,
+    onInstall: (StoreApp) -> Unit,
+    onOpen: (StoreApp) -> Unit,
+) {
     when (state) {
         is StoreUi.Idle -> {}
         is StoreUi.Loading -> {
@@ -141,7 +152,12 @@ private fun AppResults(state: StoreUi, progress: Map<String, Int>, onInstall: (S
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 24.dp),
                 ) {
                     items(state.apps, key = { it.packageName }) { app ->
-                        AppCard(app = app, pct = progress[app.packageName], onInstall = { onInstall(app) })
+                        AppCard(
+                            app = app,
+                            pct = progress[app.packageName],
+                            onInstall = { onInstall(app) },
+                            onOpen = { onOpen(app) },
+                        )
                     }
                 }
             }
@@ -150,7 +166,7 @@ private fun AppResults(state: StoreUi, progress: Map<String, Int>, onInstall: (S
 }
 
 @Composable
-private fun AppCard(app: StoreApp, pct: Int?, onInstall: () -> Unit) {
+private fun AppCard(app: StoreApp, pct: Int?, onInstall: () -> Unit, onOpen: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(SumiSurface).padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -174,8 +190,15 @@ private fun AppCard(app: StoreApp, pct: Int?, onInstall: () -> Unit) {
             pct in 0..99 -> Box(
                 Modifier.clip(RoundedCornerShape(12.dp)).background(SumiLine).padding(horizontal = 16.dp, vertical = 10.dp),
             ) { Text("$pct %", color = Kinari, fontSize = 14.sp) }
-            pct == 100 -> Text("Installation…", color = SumiMuted, fontSize = 14.sp)
-            else -> Text("Échec", color = Shu, fontSize = 14.sp)
+            pct == InstallProgress.INSTALLING -> Text("Installation…", color = SumiMuted, fontSize = 14.sp)
+            pct == InstallProgress.INSTALLED -> Box(
+                Modifier.clip(RoundedCornerShape(12.dp)).background(SumiLine)
+                    .clickable { onOpen() }.padding(horizontal = 18.dp, vertical = 10.dp),
+            ) { Text("Ouvrir", color = Kinari, fontFamily = Mincho, fontSize = 14.sp) }
+            else -> Box(
+                Modifier.clip(RoundedCornerShape(12.dp)).background(SumiSurface)
+                    .clickable { onInstall() }.padding(horizontal = 16.dp, vertical = 10.dp),
+            ) { Text("Réessayer", color = Shu, fontFamily = Mincho, fontSize = 14.sp) }
         }
     }
 }
