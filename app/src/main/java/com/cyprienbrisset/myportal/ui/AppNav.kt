@@ -1,8 +1,6 @@
 package com.cyprienbrisset.myportal.ui
 
-import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +11,7 @@ object Routes {
     const val TILE_EDIT = "tile_edit"
     const val ALARMS = "alarms"
     const val ALARM_EDIT = "alarm_edit"
+    const val STORE = "store"
 }
 
 @Composable
@@ -26,19 +25,16 @@ fun AppNav() {
             )
         }
         composable(Routes.SETTINGS) {
-            val context = LocalContext.current
             com.cyprienbrisset.myportal.ui.settings.SettingsScreen(
                 onBack = { nav.popBackStack() },
                 onTiles = { nav.navigate(Routes.TILE_EDIT) },
                 onAlarms = { nav.navigate(Routes.ALARMS) },
                 onWeather = { nav.navigate(Routes.SETTINGS + "/weather") },
-                // TEMPORARY spike entry point.
-                onFukkaLogin = {
-                    context.startActivity(
-                        Intent(context, com.cyprienbrisset.myportal.store.FukkaLoginActivity::class.java)
-                    )
-                },
+                onStore = { nav.navigate(Routes.STORE) },
             )
+        }
+        composable(Routes.STORE) {
+            com.cyprienbrisset.myportal.ui.store.StoreScreen(onBack = { nav.popBackStack() })
         }
         composable(Routes.TILE_EDIT) {
             com.cyprienbrisset.myportal.ui.settings.TileEditScreen(onBack = { nav.popBackStack() })

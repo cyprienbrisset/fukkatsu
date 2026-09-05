@@ -32,7 +32,7 @@ fun SettingsScreen(
     onTiles: () -> Unit,
     onAlarms: () -> Unit,
     onWeather: () -> Unit,
-    onFukkaLogin: () -> Unit,
+    onStore: () -> Unit = {},
 ) {
     Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -43,8 +43,7 @@ fun SettingsScreen(
         SettingRow("Tuiles", null, onTiles)
         SettingRow("Alarmes", null, onAlarms)
         SettingRow("Ville météo", null, onWeather)
-        // TEMPORARY spike entry point — remove after FukkaStore auth is validated.
-        SettingRow("FukkaStore login (test)", null, onFukkaLogin)
+        SettingRow("FukkaStore", null, onStore)
     }
 }
 
