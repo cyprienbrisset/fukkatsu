@@ -37,15 +37,6 @@
 | **Now Playing bar** | Media controls, seek bar, album art — tap to open the player |
 | **Volume slider** | Quick system media volume adjustment |
 
-### 🌐 Google Tab
-
-| Feature | Description |
-|---|---|
-| **Meet & Chat** | Persistent WebView sessions in a full-screen sheet — no re-login |
-| **App shortcuts** | Long-press shortcuts for installed Google apps |
-| **Calendar events** | Upcoming events via READ_CALENDAR permission **or** a personal ICS URL |
-| **Join Meet** | One-tap "Rejoindre" button on events containing a Meet link |
-
 ### 🛒 FukkaStore
 
 | Feature | Description |
@@ -110,16 +101,15 @@ Typography uses **Noto Serif JP** (Mincho family) throughout.
 com.cyprienbrisset.myportal
 ├── 🔔 alarm/          Scheduling, foreground service, volume ramp, boot receiver
 ├── 💾 data/           Room (tiles, alarms) · DataStore (settings) · Weather models
-├── 🔗 integration/    Calendar (native + ICS) · Google app shortcuts · Recent contacts
+├── 🔗 integration/    Recent contacts via NotificationListenerService
 ├── 🚀 launch/         Intent resolution for tile taps
 ├── 🎵 media/          Now Playing via MediaController
 ├── 🛒 store/          FukkaStore: AC2DM auth · APK download/install · gplayapi wrappers
 ├── ⚙️  system/         DND · Screen lock · NotificationListenerService · Device admin
 └── 🖌️  ui/
     ├── alarms/         Alarm list + editor
-    ├── google/         Google tab · WebView sheet · PersistentWebViewPool
-    ├── home/           HomeShell · AmbientBanner · MedallionGrid · NowPlayingBar
-    ├── settings/       Settings · ICS config · Weather · Tile editor
+    ├── home/           HomeScreen · AmbientBanner · MedallionGrid · NowPlayingBar
+    ├── settings/       Settings · Weather · Tile editor · Installed apps
     ├── store/          StoreScreen
     ├── sumi/           Design system (Medallion · HankoSeal · SectionLabel…)
     └── theme/          Color palettes · Typography · MaterialTheme wrappers

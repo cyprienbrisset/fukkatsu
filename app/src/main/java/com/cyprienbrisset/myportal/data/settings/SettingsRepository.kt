@@ -17,16 +17,6 @@ class SettingsRepository(private val context: Context) {
     private val LAT = doublePreferencesKey("weather_lat")
     private val LON = doublePreferencesKey("weather_lon")
 
-    private val ICS_URL = stringPreferencesKey("google_ics_url")
-
-    val googleIcsUrl: Flow<String?> = context.dataStore.data.map { it[ICS_URL] }
-
-    suspend fun setGoogleIcsUrl(url: String?) {
-        context.dataStore.edit { prefs ->
-            if (url.isNullOrBlank()) prefs.remove(ICS_URL) else prefs[ICS_URL] = url
-        }
-    }
-
     val weatherLocation: Flow<WeatherLocation?> = context.dataStore.data.map { p ->
         val city = p[CITY]; val lat = p[LAT]; val lon = p[LON]
         if (city != null && lat != null && lon != null) WeatherLocation(city, lat, lon) else null

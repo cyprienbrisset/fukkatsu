@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,11 +24,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
-import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
 import com.cyprienbrisset.myportal.ui.theme.Shu
-import com.cyprienbrisset.myportal.ui.theme.SumiLine
-import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 
 @Composable
 fun SettingsScreen(
@@ -37,42 +35,34 @@ fun SettingsScreen(
     onWeather: () -> Unit,
     onStore: () -> Unit = {},
     onInstalledApps: () -> Unit = {},
-    onAgenda: () -> Unit = {},
 ) {
     val ctx = LocalContext.current
     Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("朱", size = 40.dp, onClick = onBack)
             Spacer(Modifier.width(14.dp))
-            Text("Réglages", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+            Text("Réglages", fontFamily = Mincho, color = MaterialTheme.colorScheme.onBackground, fontSize = 22.sp)
         }
-        SettingRow("Tuiles", null, onTiles)
-        SettingRow("Alarmes", null, onAlarms)
-        SettingRow("Ville météo", null, onWeather)
-        SettingRow("FukkaStore", null, onStore)
-        SettingRow("Applications installées", null, onInstalledApps)
-        SettingRow("Agenda Google", null, onAgenda)
-        SettingRow("Comptes Google", null) {
-            ctx.startActivity(Intent(Settings.ACTION_SYNC_SETTINGS).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            })
-        }
-        SettingRow("Réglages système", null) {
+        SettingRow("Tuiles", onTiles)
+        SettingRow("Alarmes", onAlarms)
+        SettingRow("Ville météo", onWeather)
+        SettingRow("FukkaStore", onStore)
+        SettingRow("Applications installées", onInstalledApps)
+        SettingRow("Réglages système") {
             ctx.startActivity(Intent(Settings.ACTION_SETTINGS))
         }
     }
 }
 
 @Composable
-private fun SettingRow(text: String, value: String?, onClick: () -> Unit) {
+private fun SettingRow(text: String, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().heightIn(min = 68.dp).clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text, color = Kinari, fontSize = 17.sp, modifier = Modifier.weight(1f))
-        if (value != null) Text(value, color = SumiMuted, fontSize = 14.sp)
+        Text(text, color = MaterialTheme.colorScheme.onBackground, fontSize = 17.sp, modifier = Modifier.weight(1f))
         Spacer(Modifier.width(10.dp))
         Text("›", color = Shu, fontSize = 22.sp)
     }
-    Box(Modifier.fillMaxWidth().height(1.dp).background(SumiLine))
+    Box(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outline))
 }

@@ -3,6 +3,7 @@ package com.cyprienbrisset.myportal.ui.settings
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -91,8 +92,9 @@ fun InstalledAppsScreen(onBack: () -> Unit) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             items(apps, key = { it.packageName }) { app ->
                 AppRow(app) {
-                    val intent = Intent(Intent.ACTION_DELETE).apply {
-                        data = Uri.parse("package:${app.packageName}")
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", app.packageName, null)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
                     ctx.startActivity(intent)
                 }
