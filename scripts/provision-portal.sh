@@ -110,6 +110,13 @@ else
   warn "Impossible d'activer l'admin d'appareil automatiquement."
 fi
 
+info "Attribution de WRITE_SECURE_SETTINGS (bouton vérificateur dans Réglages)…"
+if "${A[@]}" shell pm grant "$PKG" android.permission.WRITE_SECURE_SETTINGS >/dev/null 2>&1; then
+  ok "WRITE_SECURE_SETTINGS accordé."
+else
+  warn "Impossible d'accorder WRITE_SECURE_SETTINGS."
+fi
+
 # --- Launcher principal (CHOIX utilisateur) -----------------------------------
 echo
 printf '%s————— Launcher principal —————%s\n' "$BOLD" "$RST"
