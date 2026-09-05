@@ -31,6 +31,7 @@ import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.data.tile.TileType
 import com.cyprienbrisset.myportal.launch.InstalledApp
 import com.cyprienbrisset.myportal.ui.home.TileIcon
+import com.cyprienbrisset.myportal.ui.store.StoreBody
 import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
 import com.cyprienbrisset.myportal.ui.sumi.Medallion
 import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
@@ -57,10 +58,16 @@ fun TileEditScreen(onBack: () -> Unit, vm: TileEditViewModel = viewModel()) {
         }
 
         SegmentedChoice(
-            listOf(Segment("アプリ", "Application"), Segment("ウェブ", "Web")),
+            listOf(Segment("アプリ", "Application"), Segment("ウェブ", "Web"), Segment("ストア", "Store")),
             selectedIndex = mode, onSelect = { mode = it },
         )
         Spacer(Modifier.height(22.dp))
+
+        if (mode == 2) {
+            // FukkaStore : rechercher et installer des apps sans passer par les Réglages.
+            StoreBody(Modifier.weight(1f))
+            return@Column
+        }
 
         if (mode == 0) {
             SectionLabel("追加", "TOUCHEZ POUR AJOUTER")

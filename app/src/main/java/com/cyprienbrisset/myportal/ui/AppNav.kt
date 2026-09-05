@@ -11,6 +11,9 @@ object Routes {
     const val TILE_EDIT = "tile_edit"
     const val ALARMS = "alarms"
     const val ALARM_EDIT = "alarm_edit"
+    const val STORE = "store"
+    const val INSTALLED_APPS = "installed_apps"
+    const val ICS_SETTINGS = "ics_settings"
 }
 
 @Composable
@@ -18,7 +21,7 @@ fun AppNav() {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
-            com.cyprienbrisset.myportal.ui.home.HomeScreen(
+            com.cyprienbrisset.myportal.ui.home.HomeShell(
                 onOpenSettings = { nav.navigate(Routes.SETTINGS) },
                 onAddTile = { nav.navigate(Routes.TILE_EDIT) },
             )
@@ -29,7 +32,19 @@ fun AppNav() {
                 onTiles = { nav.navigate(Routes.TILE_EDIT) },
                 onAlarms = { nav.navigate(Routes.ALARMS) },
                 onWeather = { nav.navigate(Routes.SETTINGS + "/weather") },
+                onStore = { nav.navigate(Routes.STORE) },
+                onInstalledApps = { nav.navigate(Routes.INSTALLED_APPS) },
+                onAgenda = { nav.navigate(Routes.ICS_SETTINGS) },
             )
+        }
+        composable(Routes.INSTALLED_APPS) {
+            com.cyprienbrisset.myportal.ui.settings.InstalledAppsScreen(onBack = { nav.popBackStack() })
+        }
+        composable(Routes.ICS_SETTINGS) {
+            com.cyprienbrisset.myportal.ui.settings.IcsSettingsScreen(onBack = { nav.popBackStack() })
+        }
+        composable(Routes.STORE) {
+            com.cyprienbrisset.myportal.ui.store.StoreScreen(onBack = { nav.popBackStack() })
         }
         composable(Routes.TILE_EDIT) {
             com.cyprienbrisset.myportal.ui.settings.TileEditScreen(onBack = { nav.popBackStack() })

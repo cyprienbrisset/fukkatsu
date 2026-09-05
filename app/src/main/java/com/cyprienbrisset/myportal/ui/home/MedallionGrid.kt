@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.cyprienbrisset.myportal.data.tile.TileEntity
 import com.cyprienbrisset.myportal.ui.sumi.Medallion
-import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 
 @Composable
 fun MedallionGrid(
@@ -32,13 +31,13 @@ fun MedallionGrid(
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         items(tiles, key = { it.id }) { tile ->
-            Medallion(label = tile.label, onClick = { onTileClick(tile) }) {
-                TileIcon(tile = tile, size = 46.dp)
+            Medallion(label = tile.label, onClick = { onTileClick(tile) }, disc = false) {
+                TileIcon(tile = tile, size = 64.dp)
             }
         }
         item(key = "__add__") {
             Medallion(label = "Ajouter", onClick = onAddClick, dashed = true) {
-                Text("＋", color = SumiMuted, style = MaterialTheme.typography.titleLarge)
+                Text("＋", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.titleLarge)
             }
         }
     }

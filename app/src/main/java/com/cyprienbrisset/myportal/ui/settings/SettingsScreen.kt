@@ -1,5 +1,7 @@
 package com.cyprienbrisset.myportal.ui.settings
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
@@ -27,7 +30,16 @@ import com.cyprienbrisset.myportal.ui.theme.SumiLine
 import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onTiles: () -> Unit, onAlarms: () -> Unit, onWeather: () -> Unit) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    onTiles: () -> Unit,
+    onAlarms: () -> Unit,
+    onWeather: () -> Unit,
+    onStore: () -> Unit = {},
+    onInstalledApps: () -> Unit = {},
+    onAgenda: () -> Unit = {},
+) {
+    val ctx = LocalContext.current
     Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             HankoSeal("朱", size = 40.dp, onClick = onBack)
@@ -37,6 +49,17 @@ fun SettingsScreen(onBack: () -> Unit, onTiles: () -> Unit, onAlarms: () -> Unit
         SettingRow("Tuiles", null, onTiles)
         SettingRow("Alarmes", null, onAlarms)
         SettingRow("Ville météo", null, onWeather)
+        SettingRow("FukkaStore", null, onStore)
+        SettingRow("Applications installées", null, onInstalledApps)
+        SettingRow("Agenda Google", null, onAgenda)
+        SettingRow("Comptes Google", null) {
+            ctx.startActivity(Intent(Settings.ACTION_SYNC_SETTINGS).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+        }
+        SettingRow("Réglages système", null) {
+            ctx.startActivity(Intent(Settings.ACTION_SETTINGS))
+        }
     }
 }
 

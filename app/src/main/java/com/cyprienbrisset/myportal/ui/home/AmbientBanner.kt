@@ -13,10 +13,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cyprienbrisset.myportal.data.weather.Weather
-import com.cyprienbrisset.myportal.ui.theme.Kinari
+import androidx.compose.material3.MaterialTheme
 import com.cyprienbrisset.myportal.ui.theme.Mincho
 import com.cyprienbrisset.myportal.ui.theme.Shu
-import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -32,9 +31,9 @@ fun AmbientBanner(
     val time = now.format(DateTimeFormatter.ofPattern("HH:mm"))
     val date = now.format(DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.FRENCH))
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(time, fontFamily = Mincho, fontWeight = FontWeight.Normal, color = Kinari, fontSize = if (portrait) 72.sp else 92.sp)
+        Text(time, fontFamily = Mincho, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onBackground, fontSize = if (portrait) 72.sp else 92.sp)
         Spacer(Modifier.height(12.dp))
-        Text(date, color = Kinari, fontSize = 16.sp)
+        Text(date, color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
         Spacer(Modifier.height(6.dp))
         val wx = buildString {
             if (weather != null) append("${weather.temperatureC}°  ${weather.description}")
@@ -43,7 +42,7 @@ fun AmbientBanner(
                 append("⏰ " + nextAlarm.format(DateTimeFormatter.ofPattern("EEE HH:mm", Locale.FRENCH)))
             }
         }
-        if (wx.isNotEmpty()) Text(wx, color = SumiMuted, fontSize = 14.sp, textAlign = TextAlign.Center)
+        if (wx.isNotEmpty()) Text(wx, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, textAlign = TextAlign.Center)
     }
 }
 
@@ -54,6 +53,6 @@ fun HomeBranding(portrait: Boolean, modifier: Modifier = Modifier) {
             "復活", fontFamily = Mincho, fontWeight = FontWeight.Medium, color = Shu,
             fontSize = if (portrait) 84.sp else 120.sp,
         )
-        Text("F U K K A T S U", color = SumiMuted, fontSize = 13.sp, letterSpacing = 6.sp)
+        Text("F U K K A T S U", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp, letterSpacing = 6.sp)
     }
 }
