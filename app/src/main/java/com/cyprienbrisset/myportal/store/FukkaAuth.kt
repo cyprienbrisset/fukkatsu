@@ -131,6 +131,29 @@ suspend fun topApps(authData: AuthData, limit: Int = 40): List<StoreApp> =
             .take(limit)
     }
 
+/** Browsable application categories (title + browseUrl). */
+suspend fun categories(authData: AuthData): List<StoreCategory> =
+    withContext(Dispatchers.IO) {
+        com.aurora.gplayapi.helpers.CategoryHelper(authData)
+            .getAllCategoriesList(com.aurora.gplayapi.data.models.Category.Type.APPLICATION)
+            .filter { it.title.isNotBlank() && it.browseUrl.isNotBlank() }
+            .map { StoreCategory(key = it.browseUrl, title = it.title, browseUrl = it.browseUrl) }
+            .distinctBy { it.key }
+    }
+
+/** Apps within a category, compatible with the device profile. */
+suspend fun categoryApps(authData: AuthData, browseUrl: String, limit: Int = 60): List<StoreApp> =
+    withContext(Dispatchers.IO) {
+        com.aurora.gplayapi.helpers.CategoryHelper(authData)
+            .getSubCategoryBundle(browseUrl)
+            .streamClusters.values
+            .flatMap { it.clusterAppList }
+            .filter { it.restriction == com.aurora.gplayapi.Constants.Restriction.NOT_RESTRICTED }
+            .map { it.toStoreApp() }
+            .distinctBy { it.packageName }
+            .take(limit)
+    }
+
 /**
  * Resolve the downloadable APK/split files for [packageName] via the Play "purchase" flow.
  * The [versionCode] argument is accepted for the public contract but the authoritative

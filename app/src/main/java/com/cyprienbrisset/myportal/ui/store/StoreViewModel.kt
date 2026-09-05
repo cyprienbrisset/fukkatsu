@@ -8,7 +8,10 @@ import com.cyprienbrisset.myportal.store.ApkInstaller
 import com.cyprienbrisset.myportal.store.FukkaAccount
 import com.cyprienbrisset.myportal.store.InstallEvents
 import com.cyprienbrisset.myportal.store.StoreApp
+import com.cyprienbrisset.myportal.store.StoreCategory
 import com.cyprienbrisset.myportal.store.StoreException
+import com.cyprienbrisset.myportal.store.categories as fukkaCategories
+import com.cyprienbrisset.myportal.store.categoryApps as fukkaCategoryApps
 import com.cyprienbrisset.myportal.store.files as fukkaFiles
 import com.cyprienbrisset.myportal.store.search as fukkaSearch
 import com.cyprienbrisset.myportal.store.topApps as fukkaTopApps
@@ -38,17 +41,21 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
     private val installer = ApkInstaller(app)
 
     val isLoggedIn = account.isLoggedIn.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-    private val _ui = MutableStateFlow<StoreUi>(StoreUi.Idle)
-    val ui: StateFlow<StoreUi> = _ui
-    /** Curated "top compatible apps" shown when no search is active. */
-    private val _home = MutableStateFlow<StoreUi>(StoreUi.Idle)
-    val home: StateFlow<StoreUi> = _home
+
+    /** Chips: "Populaires" first, then real categories once loaded. */
+    private val _categories = MutableStateFlow(listOf(StoreCategory(TOP_KEY, "Populaires", null)))
+    val categories: StateFlow<List<StoreCategory>> = _categories
+    private val _selectedKey = MutableStateFlow(TOP_KEY)
+    val selectedKey: StateFlow<String> = _selectedKey
+
+    /** The app grid content (Populaires / a category / search results). */
+    private val _content = MutableStateFlow<StoreUi>(StoreUi.Idle)
+    val content: StateFlow<StoreUi> = _content
+
     private val _progress = MutableStateFlow<Map<String, Int>>(emptyMap())
     val progress: StateFlow<Map<String, Int>> = _progress
 
     init {
-        // The manifest InstallResultReceiver reports the system install outcome here so the
-        // card can leave the "Installation…" state.
         viewModelScope.launch {
             InstallEvents.events.collect { e ->
                 val pkg = e.packageName ?: return@collect
@@ -58,35 +65,54 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun logout() = viewModelScope.launch { account.logout() }
-
-    /** Loads the curated home once (cached). Safe to call on every screen entry. */
+    /** Loads categories + the default "Populaires" grid once. Safe to call on every entry. */
     fun loadHome() {
-        if (_home.value is StoreUi.Results || _home.value is StoreUi.Loading) return
-        _home.value = StoreUi.Loading
+        loadCategoriesIfNeeded()
+        if (_content.value is StoreUi.Idle) selectByKey(TOP_KEY, null)
+    }
+
+    private fun loadCategoriesIfNeeded() {
+        if (_categories.value.size > 1) return
         viewModelScope.launch {
-            _home.value = try {
-                val ad = account.authData() ?: return@launch run { _home.value = StoreUi.Error("Non connecté") }
-                StoreUi.Results(fukkaTopApps(ad))
+            runCatching {
+                val ad = account.authData() ?: return@launch
+                _categories.value = listOf(StoreCategory(TOP_KEY, "Populaires", null)) + fukkaCategories(ad)
+            }
+        }
+    }
+
+    fun selectCategory(cat: StoreCategory) = selectByKey(cat.key, cat.browseUrl)
+
+    private fun selectByKey(key: String, browseUrl: String?) {
+        _selectedKey.value = key
+        _content.value = StoreUi.Loading
+        viewModelScope.launch {
+            _content.value = try {
+                val ad = account.authData()
+                    ?: return@launch run { _content.value = StoreUi.Error("Non connecté") }
+                val apps = if (key == TOP_KEY) fukkaTopApps(ad) else fukkaCategoryApps(ad, browseUrl!!)
+                if (apps.isEmpty()) StoreUi.Error("Aucune application compatible.") else StoreUi.Results(apps)
             } catch (e: StoreException) { StoreUi.Error(e.message ?: "Erreur") }
             catch (e: Exception) { StoreUi.Error("Erreur réseau") }
         }
     }
-
-    /** Clears the active search so the curated home is shown again. */
-    fun clearSearch() { _ui.value = StoreUi.Idle }
 
     fun search(query: String) {
-        if (query.isBlank()) { _ui.value = StoreUi.Idle; return }
-        _ui.value = StoreUi.Loading
+        if (query.isBlank()) { selectByKey(TOP_KEY, null); return }
+        _selectedKey.value = SEARCH_KEY
+        _content.value = StoreUi.Loading
         viewModelScope.launch {
-            _ui.value = try {
-                val ad = account.authData() ?: return@launch run { _ui.value = StoreUi.Error("Non connecté") }
-                StoreUi.Results(fukkaSearch(ad, query))
+            _content.value = try {
+                val ad = account.authData()
+                    ?: return@launch run { _content.value = StoreUi.Error("Non connecté") }
+                val apps = fukkaSearch(ad, query)
+                if (apps.isEmpty()) StoreUi.Error("Aucun résultat.") else StoreUi.Results(apps)
             } catch (e: StoreException) { StoreUi.Error(e.message ?: "Erreur") }
             catch (e: Exception) { StoreUi.Error("Erreur réseau") }
         }
     }
+
+    fun logout() = viewModelScope.launch { account.logout() }
 
     fun install(appItem: StoreApp) {
         if (!installer.canInstall()) { installer.requestPermission(); return }
@@ -99,8 +125,13 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 installer.install(appItem.packageName, local)
             } catch (e: Exception) {
-                _progress.value = _progress.value + (appItem.packageName to -1)
+                _progress.value = _progress.value + (appItem.packageName to InstallProgress.FAILED)
             }
         }
+    }
+
+    companion object {
+        const val TOP_KEY = "__top__"
+        const val SEARCH_KEY = "__search__"
     }
 }

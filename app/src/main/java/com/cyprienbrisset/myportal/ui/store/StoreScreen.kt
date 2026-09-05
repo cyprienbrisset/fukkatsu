@@ -2,6 +2,7 @@ package com.cyprienbrisset.myportal.ui.store
 
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,12 +17,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +55,7 @@ import com.cyprienbrisset.myportal.launch.LaunchIntentResolver
 import com.cyprienbrisset.myportal.store.FukkaLoginActivity
 import com.cyprienbrisset.myportal.store.StoreApp
 import com.cyprienbrisset.myportal.ui.sumi.HankoSeal
-import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
+import com.cyprienbrisset.myportal.ui.sumi.SumiChoiceChip
 import com.cyprienbrisset.myportal.ui.sumi.SumiPrimaryButton
 import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
@@ -67,16 +79,17 @@ fun StoreScreen(onBack: () -> Unit, showBack: Boolean = true, vm: StoreViewModel
 }
 
 /**
- * The reusable store body (login gate → search → curated home / results → install), without any
- * screen chrome. Embedded both in [StoreScreen] and as the "Store" tab of the tile-add page.
+ * The reusable store body: login gate → search field → category chips → app grid → install.
+ * No screen chrome; embedded both in [StoreScreen] and as the "Store" tab of the tile-add page.
  */
 @Composable
 fun StoreBody(modifier: Modifier = Modifier, vm: StoreViewModel = viewModel()) {
     val ctx = LocalContext.current
     val loggedIn by vm.isLoggedIn.collectAsStateWithLifecycle()
     var query by remember { mutableStateOf("") }
-    val ui by vm.ui.collectAsStateWithLifecycle()
-    val home by vm.home.collectAsStateWithLifecycle()
+    val content by vm.content.collectAsStateWithLifecycle()
+    val categories by vm.categories.collectAsStateWithLifecycle()
+    val selectedKey by vm.selectedKey.collectAsStateWithLifecycle()
     val progress by vm.progress.collectAsStateWithLifecycle()
 
     LaunchedEffect(loggedIn) { if (loggedIn) vm.loadHome() }
@@ -95,43 +108,71 @@ fun StoreBody(modifier: Modifier = Modifier, vm: StoreViewModel = viewModel()) {
             return@Column
         }
 
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = { query = it },
-                modifier = Modifier.weight(1f),
-                singleLine = true,
-                placeholder = { Text("Rechercher une application", color = SumiMuted) },
-            )
-            Spacer(Modifier.width(12.dp))
-            SumiPrimaryButton("Rechercher", onClick = { vm.search(query) })
-        }
-        Spacer(Modifier.height(18.dp))
-
-        // A search is "active" whenever ui is not Idle; otherwise we show the curated home.
-        val searching = ui !is StoreUi.Idle
-        if (searching) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                SectionLabel("けんさく", "RÉSULTATS", modifier = Modifier.weight(1f))
-                Text(
-                    "Effacer",
-                    color = Shu,
-                    fontFamily = Mincho,
-                    fontSize = 14.sp,
-                    modifier = Modifier.clickable { query = ""; vm.clearSearch() },
-                )
-            }
-        } else {
-            SectionLabel("おすすめ", "POPULAIRES")
-        }
+        SumiSearchField(
+            value = query,
+            onValueChange = { query = it },
+            onSearch = { vm.search(query) },
+            onClear = { query = ""; vm.search("") },
+        )
         Spacer(Modifier.height(14.dp))
 
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(categories, key = { it.key }) { cat ->
+                SumiChoiceChip(
+                    text = cat.title,
+                    selected = selectedKey == cat.key,
+                    onClick = { vm.selectCategory(cat) },
+                )
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+
         AppResults(
-            state = if (searching) ui else home,
+            state = content,
             progress = progress,
             onInstall = { vm.install(it) },
             onOpen = { LaunchIntentResolver.launch(ctx, it.packageName) },
         )
+    }
+}
+
+@Composable
+private fun SumiSearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSearch: () -> Unit,
+    onClear: () -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().height(54.dp).clip(RoundedCornerShape(14.dp))
+            .background(SumiSurface).border(1.dp, SumiLine, RoundedCornerShape(14.dp))
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Rounded.Search, contentDescription = null, tint = SumiMuted, modifier = Modifier.size(22.dp))
+        Spacer(Modifier.width(12.dp))
+        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+            if (value.isEmpty()) {
+                Text("Rechercher une application", color = SumiMuted, fontSize = 16.sp)
+            }
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                singleLine = true,
+                textStyle = TextStyle(color = Kinari, fontSize = 16.sp),
+                cursorBrush = SolidColor(Shu),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { onSearch() }),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (value.isNotEmpty()) {
+            Spacer(Modifier.width(8.dp))
+            Icon(
+                Icons.Rounded.Close, contentDescription = "Effacer", tint = SumiMuted,
+                modifier = Modifier.size(22.dp).clickable { onClear() },
+            )
+        }
     }
 }
 
@@ -151,24 +192,20 @@ private fun AppResults(
         }
         is StoreUi.Error -> Text(state.message, color = SumiMuted, fontSize = 15.sp)
         is StoreUi.Results -> {
-            if (state.apps.isEmpty()) {
-                Text("Aucune application compatible.", color = SumiMuted, fontSize = 15.sp)
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 300.dp),
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    contentPadding = PaddingValues(bottom = 24.dp),
-                ) {
-                    items(state.apps, key = { it.packageName }) { app ->
-                        AppCard(
-                            app = app,
-                            pct = progress[app.packageName],
-                            onInstall = { onInstall(app) },
-                            onOpen = { onOpen(app) },
-                        )
-                    }
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 300.dp),
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                contentPadding = PaddingValues(bottom = 24.dp),
+            ) {
+                items(state.apps, key = { it.packageName }) { app ->
+                    AppCard(
+                        app = app,
+                        pct = progress[app.packageName],
+                        onInstall = { onInstall(app) },
+                        onOpen = { onOpen(app) },
+                    )
                 }
             }
         }

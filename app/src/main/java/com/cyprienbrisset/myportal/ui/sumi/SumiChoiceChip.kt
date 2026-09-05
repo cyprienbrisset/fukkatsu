@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -29,9 +30,10 @@ fun SumiChoiceChip(text: String, selected: Boolean, onClick: () -> Unit, modifie
         modifier.height(if (circle) 52.dp else 56.dp).clip(shape)
             .background(if (selected) Shu else SumiSurface)
             .border(BorderStroke(1.dp, if (selected) Shu else SumiLine), shape)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .padding(horizontal = if (circle) 0.dp else 20.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text, color = if (selected) OnShu else Kinari, fontSize = if (circle) 15.sp else 16.sp)
+        Text(text, color = if (selected) OnShu else Kinari, fontSize = if (circle) 15.sp else 16.sp, maxLines = 1)
     }
 }
