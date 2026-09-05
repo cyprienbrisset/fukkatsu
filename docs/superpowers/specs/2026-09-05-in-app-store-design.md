@@ -1,7 +1,7 @@
 # Fukkatsu — Store intégré (API Play, sans GMS)
 
 - **Date** : 2026-09-05
-- **Statut** : Design validé, prêt pour planification
+- **Statut** : ABANDONNÉ après spike (2026-09-05). Le spike a montré que l'auth anonyme est **cassée** : le dispenser public Aurora renvoie des tokens OAuth rejetés par Google (`BadAuthentication`) et est rate-limité (429/500). gplayapi 3.2.6 et le check-in Google fonctionnent, mais sans source de tokens valide le store intégré n'est pas viable. **Pivot : installer l'app Aurora Store** (qui gère sa propre auth / permet le login Google de l'utilisateur). Dépendance gplayapi retirée.
 - **Base** : Fukkatsu (ex-MyPortal) sur `main`
 
 ## Intention
