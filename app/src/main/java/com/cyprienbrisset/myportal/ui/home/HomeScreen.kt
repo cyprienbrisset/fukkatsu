@@ -23,7 +23,9 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +51,7 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
     val weather by vm.weather.collectAsStateWithLifecycle()
     val nextAlarm by vm.nextAlarm.collectAsStateWithLifecycle()
     val nowPlaying by vm.nowPlaying.collectAsStateWithLifecycle()
+    var showDndDuration by remember { mutableStateOf(false) }
 
     val launch: (TileEntity) -> Unit = { tile ->
         when (tile.type) {
@@ -81,6 +84,8 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                             Spacer(Modifier.height(24.dp))
                             NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
                         }
+                        Spacer(Modifier.height(18.dp))
+                        VolumeSlider()
                     }
                 }
                 VerticalVermilionRule(Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp), length = 220.dp)
@@ -101,6 +106,8 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                     Spacer(Modifier.height(18.dp))
                     NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
                 }
+                Spacer(Modifier.height(18.dp))
+                VolumeSlider()
                 Spacer(Modifier.height(28.dp))
                 SectionLabel("アプリ", "MES APPS")
                 Spacer(Modifier.height(18.dp))
@@ -118,7 +125,11 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                 icon = if (dndOn) Icons.Rounded.NotificationsOff else Icons.Rounded.Notifications,
                 contentDescription = "Ne pas déranger",
                 active = dndOn,
-                onClick = { DndController.toggleOrRequest(ctx) },
+                onClick = {
+                    if (!DndController.isGranted(ctx)) DndController.toggleOrRequest(ctx)   // opens grant screen
+                    else if (dndOn) DndController.disable(ctx)
+                    else showDndDuration = true
+                },
             )
             SealIconButton(
                 icon = Icons.Rounded.PowerSettingsNew,
@@ -129,6 +140,13 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                 icon = Icons.Rounded.Settings,
                 contentDescription = "Réglages",
                 onClick = onOpenSettings,
+            )
+        }
+
+        if (showDndDuration) {
+            DndDurationDialog(
+                onDismiss = { showDndDuration = false },
+                onPick = { millis -> DndController.enableFor(ctx, millis); showDndDuration = false },
             )
         }
     }

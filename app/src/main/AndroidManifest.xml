@@ -85,6 +85,10 @@
             </intent-filter>
         </service>
 
+        <receiver android:name=".system.DndOffReceiver" android:exported="false">
+            <intent-filter><action android:name="com.cyprienbrisset.myportal.DND_OFF" /></intent-filter>
+        </receiver>
+
         <receiver android:name=".alarm.AlarmReceiver" android:exported="false" />
         <receiver android:name=".alarm.BootReceiver" android:exported="true">
             <intent-filter>
