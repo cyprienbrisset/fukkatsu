@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- Exact alarms: USE_EXACT_ALARM is auto-granted for genuine alarm-clock apps (API 33+);
          SCHEDULE_EXACT_ALARM covers API 31-32. Not needed on the Portal (API 29) but required on newer devices. -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
@@ -22,6 +23,10 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
+        <package android:name="com.google.android.calendar" />
+        <package android:name="com.google.android.apps.dynamite" />
+        <package android:name="com.google.android.apps.tachyon" />
+        <package android:name="com.google.android.apps.meetings" />
     </queries>
 
     <application
