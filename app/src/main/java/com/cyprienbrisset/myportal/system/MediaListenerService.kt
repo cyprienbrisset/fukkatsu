@@ -19,6 +19,10 @@ class MediaListenerService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        runCatching { handleNotification(sbn) }
+    }
+
+    private fun handleNotification(sbn: StatusBarNotification) {
         if (sbn.packageName !in COMM_PACKAGES) return
         val notif = sbn.notification ?: return
         val extras = notif.extras ?: return
