@@ -35,13 +35,19 @@ fun Medallion(
     discSize: Dp = 72.dp,
     focused: Boolean = false,
     dashed: Boolean = false,
+    disc: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     Column(modifier = modifier.clickable { onClick() }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top) {
-        val disc = Modifier.size(discSize).clip(CircleShape)
-            .background(if (dashed) Color.Transparent else SumiSurface)
-            .border(BorderStroke(if (focused) 2.dp else 1.dp, if (focused) Shu else SumiLine), CircleShape)
-        Box(disc, contentAlignment = Alignment.Center) { content() }
+        val discMod = if (disc) {
+            Modifier.size(discSize).clip(CircleShape)
+                .background(if (dashed) Color.Transparent else SumiSurface)
+                .border(BorderStroke(if (focused) 2.dp else 1.dp, if (focused) Shu else SumiLine), CircleShape)
+        } else {
+            // No surrounding disc — the icon shows on its own (custom app icons come later).
+            Modifier.size(discSize)
+        }
+        Box(discMod, contentAlignment = Alignment.Center) { content() }
         Spacer(Modifier.height(12.dp))
         Text(label, style = MaterialTheme.typography.titleMedium, color = Kinari, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
     }

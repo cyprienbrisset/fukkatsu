@@ -58,6 +58,7 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     fun mediaToggle() = nowPlayingController.toggle()
     fun mediaNext() = nowPlayingController.next()
     fun mediaPrev() = nowPlayingController.prev()
+    fun mediaSeek(positionMs: Long) = nowPlayingController.seekTo(positionMs)
 
     override fun onCleared() {
         nowPlayingController.dispose()

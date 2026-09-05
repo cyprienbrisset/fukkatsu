@@ -32,8 +32,8 @@ fun MedallionGrid(
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         items(tiles, key = { it.id }) { tile ->
-            Medallion(label = tile.label, onClick = { onTileClick(tile) }) {
-                TileIcon(tile = tile, size = 46.dp)
+            Medallion(label = tile.label, onClick = { onTileClick(tile) }, disc = false) {
+                TileIcon(tile = tile, size = 64.dp)
             }
         }
         item(key = "__add__") {

@@ -3,8 +3,10 @@ package com.cyprienbrisset.myportal.ui.store
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,17 +47,31 @@ import com.cyprienbrisset.myportal.ui.sumi.SectionLabel
 import com.cyprienbrisset.myportal.ui.sumi.SumiPrimaryButton
 import com.cyprienbrisset.myportal.ui.theme.Kinari
 import com.cyprienbrisset.myportal.ui.theme.Mincho
+import com.cyprienbrisset.myportal.ui.theme.OnShu
 import com.cyprienbrisset.myportal.ui.theme.Shu
 import com.cyprienbrisset.myportal.ui.theme.SumiLine
 import com.cyprienbrisset.myportal.ui.theme.SumiMuted
 import com.cyprienbrisset.myportal.ui.theme.SumiSurface
 
-/**
- * @param showBack when true the header seal navigates back (standalone screen from Settings);
- *   when false the seal is a decorative-only mark (embedded as the "Store" tab of the home shell).
- */
+/** Standalone store screen (reached from Réglages → FukkaStore). */
 @Composable
 fun StoreScreen(onBack: () -> Unit, showBack: Boolean = true, vm: StoreViewModel = viewModel()) {
+    Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
+        Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+            HankoSeal("店", size = 40.dp, onClick = if (showBack) onBack else null)
+            Spacer(Modifier.width(14.dp))
+            Text("FukkaStore", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
+        }
+        StoreBody(Modifier.weight(1f), vm)
+    }
+}
+
+/**
+ * The reusable store body (login gate → search → curated home / results → install), without any
+ * screen chrome. Embedded both in [StoreScreen] and as the "Store" tab of the tile-add page.
+ */
+@Composable
+fun StoreBody(modifier: Modifier = Modifier, vm: StoreViewModel = viewModel()) {
     val ctx = LocalContext.current
     val loggedIn by vm.isLoggedIn.collectAsStateWithLifecycle()
     var query by remember { mutableStateOf("") }
@@ -65,13 +81,7 @@ fun StoreScreen(onBack: () -> Unit, showBack: Boolean = true, vm: StoreViewModel
 
     LaunchedEffect(loggedIn) { if (loggedIn) vm.loadHome() }
 
-    Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp)) {
-        Row(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
-            HankoSeal("店", size = 40.dp, onClick = if (showBack) onBack else null)
-            Spacer(Modifier.width(14.dp))
-            Text("FukkaStore", fontFamily = Mincho, color = Kinari, fontSize = 22.sp)
-        }
-
+    Column(modifier.fillMaxWidth()) {
         if (!loggedIn) {
             Text(
                 "Connectez-vous à votre compte Google pour rechercher et installer des applications.",
@@ -147,9 +157,9 @@ private fun AppResults(
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 300.dp),
                     modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp),
-                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    contentPadding = PaddingValues(bottom = 24.dp),
                 ) {
                     items(state.apps, key = { it.packageName }) { app ->
                         AppCard(
@@ -186,7 +196,7 @@ private fun AppCard(app: StoreApp, pct: Int?, onInstall: () -> Unit, onOpen: () 
             pct == null -> Box(
                 Modifier.clip(RoundedCornerShape(12.dp)).background(Shu)
                     .clickable { onInstall() }.padding(horizontal = 18.dp, vertical = 10.dp),
-            ) { Text("Installer", color = com.cyprienbrisset.myportal.ui.theme.OnShu, fontFamily = Mincho, fontSize = 14.sp) }
+            ) { Text("Installer", color = OnShu, fontFamily = Mincho, fontSize = 14.sp) }
             pct in 0..99 -> Box(
                 Modifier.clip(RoundedCornerShape(12.dp)).background(SumiLine).padding(horizontal = 16.dp, vertical = 10.dp),
             ) { Text("$pct %", color = Kinari, fontSize = 14.sp) }

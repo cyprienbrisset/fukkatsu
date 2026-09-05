@@ -51,9 +51,22 @@ class NowPlayingController(private val context: Context) {
             ?: md?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST) ?: ""
         val art = md?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
             ?: md?.getBitmap(MediaMetadata.METADATA_KEY_ART)
-        val playing = isPlaying(c.playbackState?.state ?: PlaybackState.STATE_NONE)
-        _state.value = if (title.isBlank() && artist.isBlank()) null else NowPlaying(title, artist, playing, art)
+        val ps = c.playbackState
+        val playing = isPlaying(ps?.state ?: PlaybackState.STATE_NONE)
+        val duration = md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: -1L
+        // Extrapolate the live position from the last reported snapshot.
+        val position = if (ps != null && ps.position >= 0) {
+            val elapsed = if (playing) {
+                ((android.os.SystemClock.elapsedRealtime() - ps.lastPositionUpdateTime) * ps.playbackSpeed).toLong()
+            } else 0L
+            (ps.position + elapsed).let { if (duration > 0) it.coerceIn(0, duration) else it.coerceAtLeast(0) }
+        } else -1L
+        val canSeek = ps != null && (ps.actions and PlaybackState.ACTION_SEEK_TO) != 0L
+        _state.value = if (title.isBlank() && artist.isBlank()) null
+            else NowPlaying(title, artist, playing, art, position, duration, canSeek, c.packageName)
     }
+
+    fun seekTo(positionMs: Long) { controller?.transportControls?.seekTo(positionMs) }
 
     fun toggle() {
         val c = controller ?: return

@@ -82,7 +82,14 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                         val np = nowPlaying
                         if (np != null) {
                             Spacer(Modifier.height(24.dp))
-                            NowPlayingBar(np, onPrev = { vm.mediaPrev() }, onToggle = { vm.mediaToggle() }, onNext = { vm.mediaNext() })
+                            NowPlayingBar(
+                                np,
+                                onPrev = { vm.mediaPrev() },
+                                onToggle = { vm.mediaToggle() },
+                                onNext = { vm.mediaNext() },
+                                onSeek = { vm.mediaSeek(it) },
+                                onOpenApp = { np.packageName?.let { p -> LaunchIntentResolver.launch(ctx, p) } },
+                            )
                         }
                         Spacer(Modifier.height(18.dp))
                         VolumeSlider()

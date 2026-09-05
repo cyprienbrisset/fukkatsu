@@ -51,12 +51,15 @@ die()  { printf '%s✗ %s%s\n' "$RED" "$*" "$RST" >&2; exit 1; }
 SERIAL=""
 FORCE_BUILD=0
 VERIFIER_CHOICE=""   # "disable" | "keep" | "" (demander)
+LAUNCHER_CHOICE=""   # "set" | "skip" | "" (demander)
 while [ $# -gt 0 ]; do
   case "$1" in
     --build) FORCE_BUILD=1 ;;
     --disable-verifier) VERIFIER_CHOICE="disable" ;;
     --keep-verifier) VERIFIER_CHOICE="keep" ;;
-    -h|--help) sed -n '2,30p' "$0"; exit 0 ;;
+    --set-launcher) LAUNCHER_CHOICE="set" ;;
+    --no-launcher) LAUNCHER_CHOICE="skip" ;;
+    -h|--help) sed -n '2,32p' "$0"; exit 0 ;;
     -*) die "Option inconnue : $1" ;;
     *) SERIAL="$1" ;;
   esac
@@ -105,6 +108,37 @@ if "${A[@]}" shell dpm set-active-admin "$ADMIN" >/dev/null 2>&1; then
   ok "Administrateur d'appareil actif."
 else
   warn "Impossible d'activer l'admin d'appareil automatiquement."
+fi
+
+# --- Launcher principal (CHOIX utilisateur) -----------------------------------
+echo
+printf '%s————— Launcher principal —————%s\n' "$BOLD" "$RST"
+echo "Fukkatsu peut devenir l'écran d'accueil (launcher) du Portal : il s'ouvre"
+echo "au démarrage et au bouton accueil, à la place du launcher d'origine."
+echo
+if [ -z "$LAUNCHER_CHOICE" ]; then
+  if [ -t 0 ]; then
+    read -r -p "Définir Fukkatsu comme launcher principal ? [O/n] " ans
+    case "$ans" in
+      ""|[Oo]|[Oo][Uu][Ii]|[Yy]|[Yy][Ee][Ss]) LAUNCHER_CHOICE="set" ;;
+      *) LAUNCHER_CHOICE="skip" ;;
+    esac
+  else
+    warn "Non interactif : launcher inchangé (utilise --set-launcher)."
+    LAUNCHER_CHOICE="skip"
+  fi
+fi
+
+if [ "$LAUNCHER_CHOICE" = "set" ]; then
+  if "${A[@]}" shell cmd package set-home-activity "$PKG/.MainActivity" >/dev/null 2>&1; then
+    ok "Fukkatsu défini comme launcher principal."
+  else
+    warn "Échec via set-home-activity. Ouvre les Réglages Android → Applis par défaut →"
+    echo "  Application d'accueil, puis choisis Fukkatsu."
+  fi
+else
+  info "Launcher d'origine conservé."
+  echo "  Pour le définir plus tard : scripts/provision-portal.sh $SERIAL --set-launcher"
 fi
 
 # --- 4. Vérificateur de paquets (CHOIX utilisateur) ---------------------------
