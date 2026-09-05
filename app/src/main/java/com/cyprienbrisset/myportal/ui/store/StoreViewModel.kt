@@ -57,7 +57,7 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
                 val local = downloader.download(appItem.packageName, files) { pct ->
                     _progress.value = _progress.value + (appItem.packageName to pct)
                 }
-                installer.install(local)
+                installer.install(appItem.packageName, local)
             } catch (e: Exception) {
                 _progress.value = _progress.value + (appItem.packageName to -1)
             }

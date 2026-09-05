@@ -95,20 +95,41 @@ suspend fun searchTitles(authData: AuthData, query: String): List<String> = with
     SearchHelper(authData).searchResults(query).appList.map { it.displayName }
 }
 
+private fun com.aurora.gplayapi.data.models.App.toStoreApp() = StoreApp(
+    packageName = packageName,
+    title = displayName,
+    developer = developerName,
+    iconUrl = iconArtwork.url,
+    versionCode = versionCode,
+)
+
 /**
  * Search the Play catalog and map results to [StoreApp].
+ * Filters out device-incompatible or restricted apps.
  */
-suspend fun search(authData: AuthData, query: String): List<StoreApp> = withContext(Dispatchers.IO) {
-    SearchHelper(authData).searchResults(query).appList.map {
-        StoreApp(
-            packageName = it.packageName,
-            title = it.displayName,
-            developer = it.developerName,
-            iconUrl = it.iconArtwork.url,
-            versionCode = it.versionCode,
-        )
+suspend fun search(authData: AuthData, query: String): List<StoreApp> =
+    withContext(Dispatchers.IO) {
+        SearchHelper(authData).searchResults(query).appList
+            .filter { it.restriction == com.aurora.gplayapi.Constants.Restriction.NOT_RESTRICTED }
+            .map { it.toStoreApp() }
     }
-}
+
+/**
+ * Curated list of top FREE apps compatible with the device profile.
+ */
+suspend fun topApps(authData: AuthData, limit: Int = 40): List<StoreApp> =
+    withContext(Dispatchers.IO) {
+        com.aurora.gplayapi.helpers.TopChartsHelper(authData)
+            .getCluster(
+                com.aurora.gplayapi.helpers.TopChartsHelper.Type.APPLICATION,
+                com.aurora.gplayapi.helpers.TopChartsHelper.Chart.TOP_SELLING_FREE,
+            )
+            .clusterAppList
+            .filter { it.restriction == com.aurora.gplayapi.Constants.Restriction.NOT_RESTRICTED }
+            .map { it.toStoreApp() }
+            .distinctBy { it.packageName }
+            .take(limit)
+    }
 
 /**
  * Resolve the downloadable APK/split files for [packageName] via the Play "purchase" flow.

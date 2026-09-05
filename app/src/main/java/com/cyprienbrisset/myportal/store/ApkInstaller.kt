@@ -18,9 +18,16 @@ class ApkInstaller(private val context: Context) {
         )
     }
 
-    fun install(apks: List<File>) {
+    fun install(packageName: String, apks: List<File>) {
         val pi = context.packageManager.packageInstaller
-        val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+        val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
+            setAppPackageName(packageName)
+            setInstallLocation(android.content.pm.PackageInfo.INSTALL_LOCATION_AUTO)
+            setOriginatingUid(android.os.Process.myUid())
+            setInstallReason(android.content.pm.PackageManager.INSTALL_REASON_USER)
+            val total = apks.sumOf { it.length() }
+            if (total > 0) setSize(total)
+        }
         val sessionId = pi.createSession(params)
         pi.openSession(sessionId).use { s ->
             apks.forEach { apk ->
