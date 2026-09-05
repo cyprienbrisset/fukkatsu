@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cyprienbrisset.myportal.alarm.nextTriggerTime
 import com.cyprienbrisset.myportal.data.AppDatabase
+import com.cyprienbrisset.myportal.integration.RecentContactsRepository
 import com.cyprienbrisset.myportal.data.alarm.AlarmRepository
 import com.cyprienbrisset.myportal.data.settings.SettingsRepository
 import com.cyprienbrisset.myportal.data.tile.TileRepository
@@ -26,6 +27,9 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     private val settings = SettingsRepository(app)
     private val weatherRepo = WeatherRepository()
     private val alarmRepo = AlarmRepository(AppDatabase.get(app).alarmDao())
+
+    val recentContacts = RecentContactsRepository.contacts
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val tiles = repo.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

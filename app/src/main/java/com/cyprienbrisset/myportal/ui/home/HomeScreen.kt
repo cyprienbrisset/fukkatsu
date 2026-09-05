@@ -51,6 +51,7 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
     val weather by vm.weather.collectAsStateWithLifecycle()
     val nextAlarm by vm.nextAlarm.collectAsStateWithLifecycle()
     val nowPlaying by vm.nowPlaying.collectAsStateWithLifecycle()
+    val recentContacts by vm.recentContacts.collectAsStateWithLifecycle()
     var showDndDuration by remember { mutableStateOf(false) }
 
     val launch: (TileEntity) -> Unit = { tile ->
@@ -93,6 +94,10 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                         }
                         Spacer(Modifier.height(18.dp))
                         VolumeSlider()
+                        if (recentContacts.isNotEmpty()) {
+                            Spacer(Modifier.height(16.dp))
+                            RecentContactsStrip(recentContacts)
+                        }
                     }
                 }
                 VerticalVermilionRule(Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp), length = 220.dp)
@@ -115,6 +120,10 @@ fun HomeScreen(onOpenSettings: () -> Unit, onAddTile: () -> Unit, vm: HomeViewMo
                 }
                 Spacer(Modifier.height(18.dp))
                 VolumeSlider()
+                if (recentContacts.isNotEmpty()) {
+                    Spacer(Modifier.height(16.dp))
+                    RecentContactsStrip(recentContacts)
+                }
                 Spacer(Modifier.height(28.dp))
                 SectionLabel("アプリ", "MES APPS")
                 Spacer(Modifier.height(18.dp))
