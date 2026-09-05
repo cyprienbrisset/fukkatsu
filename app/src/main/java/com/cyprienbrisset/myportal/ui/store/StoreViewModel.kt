@@ -83,6 +83,14 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
 
     fun selectCategory(cat: StoreCategory) = selectByKey(cat.key, cat.title)
 
+    private fun markInstalled(apps: List<StoreApp>) {
+        val pm = getApplication<Application>().packageManager
+        val installed = apps.filter { runCatching { pm.getPackageInfo(it.packageName, 0); true }.getOrDefault(false) }
+        if (installed.isNotEmpty()) {
+            _progress.value = _progress.value + installed.associate { it.packageName to InstallProgress.INSTALLED }
+        }
+    }
+
     private fun selectByKey(key: String, query: String?) {
         _selectedKey.value = key
         _content.value = StoreUi.Loading
@@ -91,6 +99,7 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
                 val ad = account.authData()
                     ?: return@launch run { _content.value = StoreUi.Error("Non connecté") }
                 val apps = if (key == TOP_KEY) fukkaTopApps(ad) else fukkaCategoryApps(ad, query!!)
+                markInstalled(apps)
                 if (apps.isEmpty()) StoreUi.Error("Aucune application compatible.") else StoreUi.Results(apps)
             } catch (e: StoreException) { StoreUi.Error(e.message ?: "Erreur") }
             catch (e: Exception) { StoreUi.Error("Erreur réseau") }
@@ -106,6 +115,7 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
                 val ad = account.authData()
                     ?: return@launch run { _content.value = StoreUi.Error("Non connecté") }
                 val apps = fukkaSearch(ad, query)
+                markInstalled(apps)
                 if (apps.isEmpty()) StoreUi.Error("Aucun résultat.") else StoreUi.Results(apps)
             } catch (e: StoreException) { StoreUi.Error(e.message ?: "Erreur") }
             catch (e: Exception) { StoreUi.Error("Erreur réseau") }
