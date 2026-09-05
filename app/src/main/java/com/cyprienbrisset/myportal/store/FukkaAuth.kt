@@ -104,13 +104,21 @@ private fun com.aurora.gplayapi.data.models.App.toStoreApp() = StoreApp(
 )
 
 /**
+ * Whether the app is installable on this device. We only exclude apps Play explicitly flags as
+ * device-incompatible; browse/category endpoints often leave `restriction` UNKNOWN/GENERIC even
+ * for perfectly compatible apps, so requiring NOT_RESTRICTED wrongly empties whole categories.
+ */
+private fun com.aurora.gplayapi.data.models.App.isDeviceCompatible(): Boolean =
+    restriction != com.aurora.gplayapi.Constants.Restriction.DEVICE_RESTRICTED
+
+/**
  * Search the Play catalog and map results to [StoreApp].
  * Filters out device-incompatible or restricted apps.
  */
 suspend fun search(authData: AuthData, query: String): List<StoreApp> =
     withContext(Dispatchers.IO) {
         SearchHelper(authData).searchResults(query).appList
-            .filter { it.restriction == com.aurora.gplayapi.Constants.Restriction.NOT_RESTRICTED }
+            .filter { it.isDeviceCompatible() }
             .map { it.toStoreApp() }
     }
 
@@ -125,7 +133,7 @@ suspend fun topApps(authData: AuthData, limit: Int = 40): List<StoreApp> =
                 com.aurora.gplayapi.helpers.TopChartsHelper.Chart.TOP_SELLING_FREE,
             )
             .clusterAppList
-            .filter { it.restriction == com.aurora.gplayapi.Constants.Restriction.NOT_RESTRICTED }
+            .filter { it.isDeviceCompatible() }
             .map { it.toStoreApp() }
             .distinctBy { it.packageName }
             .take(limit)
@@ -148,7 +156,7 @@ suspend fun categoryApps(authData: AuthData, browseUrl: String, limit: Int = 60)
             .getSubCategoryBundle(browseUrl)
             .streamClusters.values
             .flatMap { it.clusterAppList }
-            .filter { it.restriction == com.aurora.gplayapi.Constants.Restriction.NOT_RESTRICTED }
+            .filter { it.isDeviceCompatible() }
             .map { it.toStoreApp() }
             .distinctBy { it.packageName }
             .take(limit)
