@@ -81,16 +81,16 @@ class StoreViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun selectCategory(cat: StoreCategory) = selectByKey(cat.key, cat.browseUrl)
+    fun selectCategory(cat: StoreCategory) = selectByKey(cat.key, cat.title)
 
-    private fun selectByKey(key: String, browseUrl: String?) {
+    private fun selectByKey(key: String, query: String?) {
         _selectedKey.value = key
         _content.value = StoreUi.Loading
         viewModelScope.launch {
             _content.value = try {
                 val ad = account.authData()
                     ?: return@launch run { _content.value = StoreUi.Error("Non connecté") }
-                val apps = if (key == TOP_KEY) fukkaTopApps(ad) else fukkaCategoryApps(ad, browseUrl!!)
+                val apps = if (key == TOP_KEY) fukkaTopApps(ad) else fukkaCategoryApps(ad, query!!)
                 if (apps.isEmpty()) StoreUi.Error("Aucune application compatible.") else StoreUi.Results(apps)
             } catch (e: StoreException) { StoreUi.Error(e.message ?: "Erreur") }
             catch (e: Exception) { StoreUi.Error("Erreur réseau") }

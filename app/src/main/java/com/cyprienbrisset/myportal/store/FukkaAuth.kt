@@ -139,23 +139,24 @@ suspend fun topApps(authData: AuthData, limit: Int = 40): List<StoreApp> =
             .take(limit)
     }
 
-/** Browsable application categories (title + browseUrl). */
+/** Browsable application categories (localized title). */
 suspend fun categories(authData: AuthData): List<StoreCategory> =
     withContext(Dispatchers.IO) {
         com.aurora.gplayapi.helpers.CategoryHelper(authData)
             .getAllCategoriesList(com.aurora.gplayapi.data.models.Category.Type.APPLICATION)
-            .filter { it.title.isNotBlank() && it.browseUrl.isNotBlank() }
-            .map { StoreCategory(key = it.browseUrl, title = it.title, browseUrl = it.browseUrl) }
+            .filter { it.title.isNotBlank() }
+            .map { StoreCategory(key = it.browseUrl.ifBlank { it.title }, title = it.title, browseUrl = it.browseUrl) }
             .distinctBy { it.key }
     }
 
-/** Apps within a category, compatible with the device profile. */
-suspend fun categoryApps(authData: AuthData, browseUrl: String, limit: Int = 60): List<StoreApp> =
+/**
+ * Apps for a category. gplayapi 3.2.6's protobuf category-browse endpoint (getSubCategoryBundle)
+ * no longer returns clusters on current Play, so we resolve category apps via the working search
+ * endpoint using the category name as the query.
+ */
+suspend fun categoryApps(authData: AuthData, query: String, limit: Int = 60): List<StoreApp> =
     withContext(Dispatchers.IO) {
-        com.aurora.gplayapi.helpers.CategoryHelper(authData)
-            .getSubCategoryBundle(browseUrl)
-            .streamClusters.values
-            .flatMap { it.clusterAppList }
+        com.aurora.gplayapi.helpers.SearchHelper(authData).searchResults(query).appList
             .filter { it.isDeviceCompatible() }
             .map { it.toStoreApp() }
             .distinctBy { it.packageName }
