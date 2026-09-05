@@ -6,7 +6,9 @@ package com.cyprienbrisset.myportal.store
 
 import android.content.Context
 import com.aurora.gplayapi.data.models.AuthData
+import com.aurora.gplayapi.helpers.AppDetailsHelper
 import com.aurora.gplayapi.helpers.AuthHelper
+import com.aurora.gplayapi.helpers.PurchaseHelper
 import com.aurora.gplayapi.helpers.SearchHelper
 import java.util.Locale
 import java.util.Properties
@@ -92,6 +94,34 @@ suspend fun buildAuthDataFromAas(context: Context, email: String, aasToken: Stri
 suspend fun searchTitles(authData: AuthData, query: String): List<String> = withContext(Dispatchers.IO) {
     SearchHelper(authData).searchResults(query).appList.map { it.displayName }
 }
+
+/**
+ * Search the Play catalog and map results to [StoreApp].
+ */
+suspend fun search(authData: AuthData, query: String): List<StoreApp> = withContext(Dispatchers.IO) {
+    SearchHelper(authData).searchResults(query).appList.map {
+        StoreApp(
+            packageName = it.packageName,
+            title = it.displayName,
+            developer = it.developerName,
+            iconUrl = it.iconArtwork.url,
+            versionCode = it.versionCode,
+        )
+    }
+}
+
+/**
+ * Resolve the downloadable APK/split files for [packageName] via the Play "purchase" flow.
+ * The [versionCode] argument is accepted for the public contract but the authoritative
+ * version/offerType are taken from the freshly fetched app details.
+ */
+suspend fun files(authData: AuthData, packageName: String, versionCode: Int): List<ApkFile> =
+    withContext(Dispatchers.IO) {
+        val details = AppDetailsHelper(authData).getAppByPackageName(packageName)
+        val gFiles = PurchaseHelper(authData)
+            .purchase(details.packageName, details.versionCode, details.offerType)
+        gFiles.map { ApkFile(name = it.name, url = it.url, size = it.size) }
+    }
 
 private fun parseKeyValueResponse(response: String): Map<String, String> {
     val map = HashMap<String, String>()
